@@ -1,6 +1,7 @@
 package tn.esprit.pidev.entities;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @AllArgsConstructor
@@ -11,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @Document(collection = "users")
 public class User {
+    @Id
     public int id;
     public String lastName;
     public String firstName;
