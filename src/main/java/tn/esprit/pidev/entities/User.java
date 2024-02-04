@@ -1,13 +1,14 @@
 package tn.esprit.pidev.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Setter
+@Getter
+@ToString
 @Document(collection = "users")
 public class User {
     public int id;
@@ -17,9 +18,10 @@ public class User {
     public String password;
     public String resume;
     public String pic;
-    public int unvId;
+    public String unvId;
     public Level level;
     public String phoneNumber;
     public String emailPro;
     public String company;
+    public Role role ;
 }
