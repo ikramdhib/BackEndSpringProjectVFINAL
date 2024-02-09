@@ -14,5 +14,5 @@ public class Reclamation {
     public String from;
     public String to;
     public String body;
-    public String objective;
+    public Objectif objective;
 }
