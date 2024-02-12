@@ -1,7 +1,14 @@
 package tn.esprit.pidev.Services;
 
+import org.bson.types.ObjectId;
+import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
 
+import java.util.List;
+
 public interface IServiceUser {
-    public User addUser(User user);
+    public List<User> getStudentsWithStage();
+    public List<User> getUsersWithStageData();
+    public List<User> getUsersWithStages() ;
+    public List<User> getUsersWithStagess();
 }
