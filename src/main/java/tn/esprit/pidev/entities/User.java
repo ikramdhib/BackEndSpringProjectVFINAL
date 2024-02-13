@@ -3,6 +3,7 @@ package tn.esprit.pidev.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @AllArgsConstructor
@@ -10,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @Document(collection = "users")
 public class User {
-    public int id;
+    public String _id;
     public String lastName;
     public String firstName;
     public String login;
@@ -22,4 +23,7 @@ public class User {
     public String phoneNumber;
     public String emailPro;
     public String company;
+    @DBRef
+    private Offre offre;
+
 }
