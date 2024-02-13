@@ -1,4 +1,4 @@
-package tn.esprit.pidev.RestControllers.AuthController;
+package tn.esprit.pidev.RestControllers.AuthController.Param;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthenticateResponse {
 
-    private String token ;
+    private String acesstoken ;
+    private String refreshToken;
 
 }

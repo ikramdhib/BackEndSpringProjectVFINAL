@@ -1,4 +1,4 @@
-package tn.esprit.pidev.RestControllers.AuthController;
+package tn.esprit.pidev.RestControllers.AuthController.Param;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
