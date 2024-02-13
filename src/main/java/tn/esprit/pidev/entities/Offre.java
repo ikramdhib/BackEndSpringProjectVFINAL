@@ -23,6 +23,7 @@ public class Offre {
 
     @Id
     private String _id;
+
     private String nomEntreprise;
     private byte[] logoentreprise;
     private String nomEncadrant;
