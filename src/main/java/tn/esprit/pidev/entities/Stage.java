@@ -13,12 +13,12 @@ import java.util.Date;
 @Data
 @Document(collection = "stages")
 public class Stage {
-    public ObjectId id;
+    public String id;
     public String journal;
     public String certificate;
     public String report;
-    public Date startAt;
-    public Date endAt;
+    public String startAt;
+    public String endAt;
     public Type type;
     public String nomCoach;
     public String prenomCoach;

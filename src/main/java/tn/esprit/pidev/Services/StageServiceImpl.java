@@ -1,6 +1,8 @@
 package tn.esprit.pidev.Services;
 
 import lombok.AllArgsConstructor;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.esprit.pidev.Repositories.RoleRepository;
 import tn.esprit.pidev.Repositories.StageRepository;
@@ -12,6 +14,7 @@ import tn.esprit.pidev.entities.RoleName;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.bson.types.ObjectId;
 
 @Service
 @AllArgsConstructor
@@ -19,6 +22,8 @@ public class StageServiceImpl implements IServiceStage{
     private UserRepository userRepository;
     private StageRepository stageRepository;
     private RoleRepository roleRepository;
+    private EmailService emailService;
+
 
 
 
@@ -43,7 +48,38 @@ public class StageServiceImpl implements IServiceStage{
 
         return stageUserNames;
     }
+    public void sendEmailToEncadrant(String stageId) {
+        Stage stage = stageRepository.findById(stageId).orElse(null);
+        if (stage != null && stage.getUser() != null) {
+            User user = stage.getUser();
+            String encadrantEmail = stage.getEmailCoach();
+            String subject = "Validation de stage";
+            String text = "Bonjour, voici vos identifiants pour valider le stage de l'étudiant : \n"
+                    + "E-mail : " + user.getEmailPro() + "\n"
+                    + "Mot de passe : " + generateRandomPassword();
+            emailService.sendEmail(encadrantEmail, subject, text);
+        }
     }
+
+    private String generateRandomPassword() {
+        String password = UUID.randomUUID().toString().replace("-", "").substring(0, 8); // Obtenez une chaîne de 8 caractères
+        return password;
+    }
+
+    public void sendEmailToStudent(String stageId) {
+        Stage stage = stageRepository.findById(stageId).orElse(null);
+        if (stage != null && stage.getUser() != null) {
+            User user = stage.getUser();
+            String studentEmail = user.getEmailPro(); // Suppose que l'e-mail professionnel de l'étudiant est utilisé
+            String subject = "Refus de validation de stage";
+            String text = "Bonjour " + user.getFirstName() + ",\n\n" +
+                    "Nous regrettons de vous informer que les données de votre stage n'ont pas été validées.\n" +
+                    "Veuillez prendre les mesures nécessaires pour corriger les problèmes éventuels.\n\n" +
+                    "Cordialement,\n" +
+                    "L'équipe de validation de stage";
+            emailService.sendEmail(studentEmail, subject, text);
+        }
+    }}
 
 
 

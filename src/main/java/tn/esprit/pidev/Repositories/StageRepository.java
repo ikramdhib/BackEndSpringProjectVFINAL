@@ -6,6 +6,6 @@ import tn.esprit.pidev.entities.User;
 
 import java.util.List;
 
-public interface StageRepository extends MongoRepository<Stage,Integer> {
+public interface StageRepository extends MongoRepository<Stage,String> {
     List<Stage> findByUser(User user);
 }

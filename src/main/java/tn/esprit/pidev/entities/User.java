@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @Document(collection = "users")
 public class User {
-    public ObjectId id;
+    public String id;
     public String lastName;
     public String firstName;
     public String login;
@@ -32,8 +32,8 @@ public class User {
     private List<Stage> stage;
 
 
-    public User(ObjectId id, String firstName, String lastName) {
-        this.id = new ObjectId(id.getDate());
+    public User(String id, String firstName, String lastName) {
+      this.id=id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.company = company;
