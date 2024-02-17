@@ -4,27 +4,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Services.OffreServiceImpl;
 import tn.esprit.pidev.entities.Offre;
+import tn.esprit.pidev.entities.Type;
 
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/offres")
 public class OffreRestController {
+
 
     @Autowired
     private OffreServiceImpl offreService;
@@ -32,24 +33,12 @@ public class OffreRestController {
     public List<Offre> getAllOffres() {
         return offreService.getAllOffres();
     }
-    private String generateLogoUrlForEntreprise(String nomEntreprise) {
-        // Ici, vous générez l'URL du logo en fonction du nom de l'entreprise
-        // Vous pouvez récupérer l'URL à partir d'une source de données ou la construire dynamiquement
-        return "http://example.com/logos/" + nomEntreprise + ".png";
-    }
+
 
 
     @GetMapping("/byEntreprise")
     public Map<String, List<Offre>> groupOffresByEntreprise() {
         Map<String, List<Offre>> offresByEntreprise = offreService.groupOffresByEntreprise();
-
-        // Transformez les données binaires du logo en URL du logo pour chaque entreprise
-        offresByEntreprise.forEach((entreprise, offres) -> {
-            String logoUrl = generateLogoUrlForEntreprise(entreprise);
-            offres.forEach(offre -> {
-                offre.setLogoentrepriseUrl(logoUrl);
-            });
-        });
 
         return offresByEntreprise;
     }
@@ -64,30 +53,58 @@ public class OffreRestController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
     @PostMapping("/add")
-    public ResponseEntity<Offre> createOffre(@RequestParam("file") MultipartFile file,
-                                             @RequestParam("nomEntreprise") String nomEntreprise,
-                                             @RequestParam("nomEncadrant") String nomEncadrant,
-                                             @RequestParam("prenomEncadrant") String prenomEncadrant,
-                                             @RequestParam("email") String email,
-                                             @RequestParam("description") String description,
-                                             @RequestParam("userId") String userId) { // Ajoutez un paramètre pour l'ID de l'utilisateur
+    public ResponseEntity<?> addOffreWithImage(@RequestParam("nomEntreprise") String nomEntreprise,
+                                               @RequestParam("nomEncadrant") String nomEncadrant,
+                                               @RequestParam("prenomEncadrant") String prenomEncadrant,
+                                               @RequestParam("email") String email,
+                                               @RequestParam("description") String description,
+                                               @RequestParam("datedebut_stage") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date datedebut_stage,
+                                               @RequestParam("datefin_stage") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.util.Date datefin_stage,
+                                               @RequestParam("type") Type type,
+                                               @RequestParam("duree") Number duree,
+                                               @RequestParam(value = "image") MultipartFile imageFile,
+                                               @RequestParam("userId") String userId) {
         try {
-            byte[] fileBytes = file.getBytes();
+            Offre offre = new Offre();
+            offre.setNomEntreprise(nomEntreprise);
+            offre.setNomEncadrant(nomEncadrant);
+            offre.setPrenomEncadrant(prenomEncadrant);
+            offre.setEmail(email);
+            offre.setDescription(description);
+            offre.setDatedebut_stage(datedebut_stage);
+            offre.setDatefin_stage(datefin_stage);
+            offre.setType(type);
+            offre.setDuree(duree);
 
-            // Créez une nouvelle offre
-            Offre nouvelleOffre = new Offre();
-            nouvelleOffre.setNomEntreprise(nomEntreprise);
-            nouvelleOffre.setLogoentreprise(fileBytes);
-            nouvelleOffre.setNomEncadrant(nomEncadrant);
-            nouvelleOffre.setPrenomEncadrant(prenomEncadrant);
-            nouvelleOffre.setEmail(email);
-            nouvelleOffre.setDescription(description);
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String imageUrl = offreService.saveImage(imageFile);
+                offre.setImageUrl(imageUrl);
+            }
 
-            // Utilisez le service pour créer l'offre en associant l'ID de l'utilisateur
-            Offre savedOffre = offreService.createOffre(nouvelleOffre, userId);
-            return new ResponseEntity<>(savedOffre, HttpStatus.OK);
+            Offre savedOffre = offreService.createOffre(offre, userId);
+            return ResponseEntity.ok(savedOffre);
         } catch (IOException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur s'est produite lors de l'enregistrement de l'offre ou de l'image.");
+        }
+    }
+
+    @PostMapping("/images")
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile imageFile) {
+        if (imageFile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Le fichier ne doit pas être vide");
+        }
+
+        try {
+            String imageUrl = offreService.saveImage(imageFile); // Save the image and get its URL
+            Map<String, String> response = new HashMap<>();
+            response.put("url", imageUrl); // Send the image URL in the response
+            return ResponseEntity.ok(response);
+        } catch (IOException e) {
+            String errorMessage = "Erreur lors du téléchargement de l'image: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(errorMessage);
         }
     }
 

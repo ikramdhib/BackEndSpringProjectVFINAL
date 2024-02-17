@@ -25,38 +25,31 @@ public class Offre {
     private String _id;
 
     private String nomEntreprise;
-    private byte[] logoentreprise;
+
     private String nomEncadrant;
     private String prenomEncadrant;
     private String email;
     private String description;
-    private LocalDate datedebut_stage;
-    private LocalDate datefin_stage;
-    private String logoentrepriseUrl; // Nouvel attribut pour l'URL du logo
+
+    private Type type;
+    @DateTimeFormat
+    private Date datedebut_stage;
+    @DateTimeFormat
+
+    private Date datefin_stage;
+    private Number duree;
     @DBRef
     private User user;
 
-    public String getLogoentrepriseUrl() {
-        return logoentrepriseUrl;
+    private String imageUrl;
+
+    public String getImage() {
+        return imageUrl;
     }
 
-    public void setLogoentrepriseUrl(String logoentrepriseUrl) {
-        this.logoentrepriseUrl = logoentrepriseUrl;
+    public void setImage(String image) {
+        this.imageUrl = image;
     }
-
-    public byte[] getLogoentreprise() {
-        return logoentreprise;
-    }
-
-    public void setLogoentreprise(byte[] logoentreprise) {
-        this.logoentreprise = logoentreprise;
-    }
-
-    public Offre(byte[] logoentreprise) {
-        this.logoentreprise = logoentreprise;
-    }
-
-
 
     public String get_id() {
         return _id;
@@ -79,7 +72,7 @@ public class Offre {
         return "Offre{" +
                 "_id='" + _id + '\'' +
                 ", nomEntreprise='" + nomEntreprise + '\'' +
-                ", logoentreprise='" + logoentreprise + '\'' +
+                 '\'' +
                 ", nomEncadrant='" + nomEncadrant + '\'' +
                 ", prenomEncadrant='" + prenomEncadrant + '\'' +
                 ", email='" + email + '\'' +
@@ -124,19 +117,19 @@ public class Offre {
         this.description = description;
     }
 
-    public LocalDate getDatedebut_stage() {
+    public Date getDatedebut_stage() {
         return datedebut_stage;
     }
 
-    public void setDatedebut_stage(LocalDate datedebut_stage) {
+    public void setDatedebut_stage(Date datedebut_stage) {
         this.datedebut_stage = datedebut_stage;
     }
 
-    public LocalDate getDatefin_stage() {
+    public Date getDatefin_stage() {
         return datefin_stage;
     }
 
-    public void setDatefin_stage(LocalDate datefin_stage) {
+    public void setDatefin_stage(Date datefin_stage) {
         this.datefin_stage = datefin_stage;
     }
 

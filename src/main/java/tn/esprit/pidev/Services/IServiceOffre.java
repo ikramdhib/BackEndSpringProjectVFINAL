@@ -1,11 +1,14 @@
 package tn.esprit.pidev.Services;
 
 import org.bson.types.ObjectId;
+import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.entities.Offre;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface IServiceOffre {
     // Create
@@ -24,5 +27,8 @@ public interface IServiceOffre {
 
     Map<String, List<Offre>> groupOffresByEntreprise();
 
+    // Méthode pour télécharger les images et les convertir en URL
+
+    public String saveImage(MultipartFile imageFile)throws IOException;
 }
 
