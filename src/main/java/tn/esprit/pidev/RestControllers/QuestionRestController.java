@@ -19,28 +19,11 @@ import java.util.Map;
 public class QuestionRestController {
     private QuestionServiceImpl questionService;
     @PostMapping("/addQuestion")
-    public ResponseEntity<?> addQuestion(@RequestParam("titre") String titre,
-                                         @RequestParam("content") String content,
-                                         @RequestParam(value = "image", required = false) MultipartFile image) {
-        try {
-            Question question = new Question();
-            question.setTitre(titre);
-            question.setContent(content);
-
-            if (image != null && !image.isEmpty()) {
-                String imageUrl = questionService.saveImage(image);
-                question.setImageUrl(imageUrl);  // Assurez-vous que votre entité Question a un champ pour stocker l'URL de l'image
-            }
-
-            Question savedQuestion = questionService.addQuestion(question);
-            return ResponseEntity.ok(savedQuestion);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur s'est produite lors de l'enregistrement de la question ou de l'image.");
-        }
+    public Question addQuestion(Question question) {
+        return questionService.addQuestion(question);
     }
     @PostMapping("/images")
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile imageFile) {
+     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile imageFile) {
         if (imageFile.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le fichier ne doit pas être vide");
         }

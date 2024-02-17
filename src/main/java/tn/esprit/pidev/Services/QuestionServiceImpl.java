@@ -21,10 +21,14 @@ import java.util.UUID;
 public class QuestionServiceImpl implements IServiceQuestion {
     private QuestionRepository questionRepository;
     private final Path rootLocation = Paths.get("images/");
+
+
     @Override
     public Question addQuestion(Question question) {
         return questionRepository.save(question);
     }
+
+
     public String saveImage(MultipartFile imageFile) throws IOException {
         //vérifier si le fichier reçu est vide
         if (imageFile.isEmpty()) {
