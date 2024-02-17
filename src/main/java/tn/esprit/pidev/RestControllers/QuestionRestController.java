@@ -29,7 +29,7 @@ public class QuestionRestController {
 
             if (image != null && !image.isEmpty()) {
                 String imageUrl = questionService.saveImage(image);
-                question.setImageUrl(imageUrl);  // Assurez-vous que votre entité Question a un champ pour stocker l'URL de l'image
+                question.setImageUrl(imageUrl);  
             }
 
             Question savedQuestion = questionService.addQuestion(question);
