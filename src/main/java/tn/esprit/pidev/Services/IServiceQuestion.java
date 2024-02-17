@@ -1,7 +1,9 @@
 package tn.esprit.pidev.Services;
 
+import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.entities.Question;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface IServiceQuestion {
