@@ -4,13 +4,21 @@ import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.RestControllers.AuthController.Param.AuthenticateResponse;
 import tn.esprit.pidev.RestControllers.AuthController.Param.AuthenticationRequest;
 import tn.esprit.pidev.RestControllers.AuthController.Param.RegesterRequest;
+import tn.esprit.pidev.entities.RoleName;
 import tn.esprit.pidev.entities.User;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface IServiceUser {
 
     User addStudentUser(User user);
 
     String saveImageForUsers(MultipartFile file) throws IOException;
+
+    User addSupervisor(User user);
+
+    Boolean blockUser(String id);
+
+    List<User> getAllUserWithRole(RoleName roleName);
 }

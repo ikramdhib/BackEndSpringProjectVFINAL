@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -72,5 +73,43 @@ public class UserServiceImpl implements IServiceUser {
 
         String fileUrl = "/images/"+fileName;
         return fileUrl;
+    }
+
+    @Override
+    public User addSupervisor(User user) {
+        return userRepository.save(
+                User.builder()
+                        .lastName(user.lastName)
+                        .firstName(user.firstName)
+                        .address(user.address)
+                        .login(user.login)
+                        .password(passwordEncoder.encode(user.password))
+                        .phoneNumber(user.phoneNumber)
+                        .role(RoleName.ENCADRANT)
+                        .activated(false)
+                        .emailPro(user.emailPro)
+                        .company(user.company)
+                        .pic(user.pic)
+                        .cin(user.cin)
+                        .build()
+        );
+    }
+
+    @Override
+    public Boolean blockUser(String id) {
+        User user = userRepository.findById(id).orElse(null);
+
+        if(user.isActivated()){
+            user.setActivated(false);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public List<User> getAllUserWithRole(RoleName roleName) {
+
+        return userRepository.findByRole(roleName);
     }
 }

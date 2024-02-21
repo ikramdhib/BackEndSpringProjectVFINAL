@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Services.UserServices.UserServiceImpl;
 import tn.esprit.pidev.entities.Level;
+import tn.esprit.pidev.entities.RoleName;
 import tn.esprit.pidev.entities.User;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -57,5 +59,61 @@ public class UserRestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("bad request");
         }
+    }
+
+    @PostMapping("/addSupervisor")
+    public ResponseEntity<?> addSupervisorUser(@RequestParam(value = "file" , required = false) MultipartFile file ,
+                                               @RequestParam("login") String login ,
+                                               @RequestParam("password") String password ,
+                                               @RequestParam("lastName") String lastName,
+                                               @RequestParam("firstName") String firstName,
+                                               @RequestParam("phoneNumber") String phoneNumber ,
+                                               @RequestParam("address") String address,
+                                               @RequestParam("cin") String cin ,
+                                               @RequestParam("emailPro") String emailPro,
+                                               @RequestParam("company") String company) throws IOException {
+        try {
+            User user = new User();
+            user.setPhoneNumber(phoneNumber);
+            user.setLastName(lastName);
+            user.setFirstName(firstName);
+            user.setCin(cin);
+            user.setAddress(address);
+            user.setLogin(login);
+            user.setPassword(password);
+            user.setEmailPro(emailPro);
+            user.setCompany(company);
+
+            if (!file.isEmpty()) {
+                String fileUrl = userService.saveImageForUsers(file);
+                user.setPic(fileUrl);
+            }
+
+            User user1 = userService.addSupervisor(user);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(user1);
+
+        }catch (IOException e){
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("bad Request");
+        }
+    }
+
+    @PutMapping("/blockUser/{id}")
+    public ResponseEntity<?> blockUser(@PathVariable String id){
+        if(userService.blockUser(id)){
+            return ResponseEntity.status(HttpStatus.OK).body("USER BLOCKED");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("USER NOT BLOCKE");
+    }
+
+    @GetMapping("/users/{roleName}")
+    public ResponseEntity<?> getAllUsersWithRole(@PathVariable RoleName roleName){
+        List<User> users = userService.getAllUserWithRole(roleName);
+        if(!users.isEmpty()){
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(users);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("NO AVAILABLE USERS");
     }
 }
