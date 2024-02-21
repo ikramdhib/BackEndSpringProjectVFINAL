@@ -26,6 +26,7 @@ public class StageRestController {
         public String sendEmailToEncadrant(@PathVariable String stageId) {
                 try {
                         iServiceStage.sendEmailToEncadrant(stageId);
+                        iServiceStage.updateEncadrantInfoAndRemoveFromStage(stageId); // Appel de la méthode pour mettre à jour l'utilisateur et supprimer les informations de l'encadrant de la table Stage
                         return "E-mail envoyé à l'encadrant avec succès.";
                 } catch (Exception e) {
                         e.printStackTrace();
@@ -41,4 +42,11 @@ public class StageRestController {
                         e.printStackTrace();
                         return "Une erreur s'est produite lors de l'envoi de l'e-mail à l'étudiant.";
                 }
-}}
+
+}
+        @GetMapping("/studentsByEncadrant/{encadrantId}")
+        public List<User> getStudentsByEncadrantId(@PathVariable String encadrantId) {
+                return iServiceStage.getStudentsByEncadrantId(encadrantId);
+        }
+
+}

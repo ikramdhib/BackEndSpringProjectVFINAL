@@ -26,6 +26,8 @@ public class User {
     public String phoneNumber;
     public String emailPro;
     public String company;
+    public RoleName role ;
+
     //@DBRef
   // private Role role;
     @DBRef

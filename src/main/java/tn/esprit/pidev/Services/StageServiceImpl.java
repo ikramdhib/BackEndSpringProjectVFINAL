@@ -58,6 +58,9 @@ public class StageServiceImpl implements IServiceStage{
                     + "E-mail : " + user.getEmailPro() + "\n"
                     + "Mot de passe : " + generateRandomPassword();
             emailService.sendEmail(encadrantEmail, subject, text);
+
+            // Après l'envoi de l'e-mail, mettre à jour les informations de l'encadrant et les supprimer de la table Stage
+            updateEncadrantInfoAndRemoveFromStage(stageId);
         }
     }
 
@@ -79,7 +82,49 @@ public class StageServiceImpl implements IServiceStage{
                     "L'équipe de validation de stage";
             emailService.sendEmail(studentEmail, subject, text);
         }
-    }}
+    }
+    public void updateEncadrantInfoAndRemoveFromStage(String stageId) {
+        Stage stage = stageRepository.findById(stageId).orElse(null);
+        if (stage != null && stage.getUser() != null) {
+            // Récupérer les informations de l'encadrant depuis le stage
+            String firstName = stage.getNomCoach();
+            String lastName = stage.getPrenomCoach();
+            String phoneNumber = stage.getNumCoach();
+            String emailPro = stage.getEmailCoach();
+
+            // Créer un nouvel utilisateur avec le rôle "encadrant"
+            User encadrant = new User();
+            encadrant.setFirstName(firstName);
+            encadrant.setLastName(lastName);
+            encadrant.setPhoneNumber(phoneNumber);
+            encadrant.setEmailPro(emailPro);
+            encadrant.setRole(RoleName.ENCADRANT); // Définir le rôle d'encadrant
+
+            // Sauvegarder le nouvel utilisateur dans la table User
+            userRepository.save(encadrant);
+
+            // Affecter ce nouvel encadrant au stage
+            stage.setUser(encadrant);
+
+            // Supprimer les informations de l'encadrant de la table Stage
+            stage.setNomCoach(null);
+            stage.setPrenomCoach(null);
+            stage.setNumCoach(null);
+            stage.setEmailCoach(null);
+
+            // Sauvegarder les modifications du stage avec le nouvel encadrant
+            stageRepository.save(stage);
+        }
+    }
+
+    @Override
+    public List<User> getStudentsByEncadrantId(String encadrantId) {
+        return stageRepository.findByUser_Id(encadrantId)
+                .stream()
+                .map(Stage::getUser)
+                .collect(Collectors.toList());
+    }
+}
 
 
 

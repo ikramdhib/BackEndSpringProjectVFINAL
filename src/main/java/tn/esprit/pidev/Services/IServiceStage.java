@@ -12,4 +12,6 @@ public interface IServiceStage {
     public Map<String, String> getAllStagesWithUserNames();
     public void sendEmailToEncadrant(String stageId);
     public void sendEmailToStudent(String stageId) ;
+    public void updateEncadrantInfoAndRemoveFromStage(String stageId);
+    List<User> getStudentsByEncadrantId(String encadrantId);
     }
