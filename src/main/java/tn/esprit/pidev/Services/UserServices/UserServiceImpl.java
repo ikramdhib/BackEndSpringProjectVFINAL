@@ -2,9 +2,11 @@ package tn.esprit.pidev.Services.UserServices;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import tn.esprit.pidev.Configurations.JwtService;
 import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.entities.User;
 
@@ -26,6 +28,8 @@ public class UserServiceImpl implements IServiceUser {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final JwtService jwtService;
     private final Path rootLocation = Paths.get("images");
 
     public User findByLoginLike(String username) {
@@ -112,4 +116,18 @@ public class UserServiceImpl implements IServiceUser {
 
         return userRepository.findByRole(roleName);
     }
+    @Override
+    public boolean createPasswordResetToken(String token , UserDetails userDetails){
+        return jwtService.isTokenValide(token,userDetails);
+    }
+    @Override
+    public String generateToken(User user){
+        return jwtService.generatePasswordRessetToken(user);
+    }
+    @Override
+    public void changePassword(User user , String newPassword){
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
 }

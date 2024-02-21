@@ -28,15 +28,21 @@ public class JwtService {
     private long jwtExpiration;
     @Value("${application.security.jwt.refresh-token.expiration}")
     private   long refreshExpiration;
+    @Value("${application.security.jwt.PasswordReset-token.expiration}")
+    private long jwtPassExpriration;
     public String extractLogin(String token){
         return extractClaim(token , Claims::getSubject);
     }
+
     public <T> T extractClaim(String token , Function<Claims , T> claimsResolver){
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-
+    public String generatePasswordRessetToken(UserDetails userDetails){
+        log.info(jwtPassExpriration+"++++++++++++++++++++++++++++");
+        return buildToken(new HashMap<>(),userDetails,jwtPassExpriration);
+    }
     public String generateToken(UserDetails userDetails){
         return generateToken(new HashMap<>() , userDetails);
     }
