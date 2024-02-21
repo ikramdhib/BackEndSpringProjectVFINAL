@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.Email;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,15 +24,14 @@ import java.util.List;
 @Document(collection = "users")
 public class User  implements UserDetails {
     public String id;
-    @NotBlank
     @Size(max = 20)
     public String lastName;
-    @NotBlank
     @Size(max = 20)
     public String firstName;
     @Email
     @NotBlank
     @Size(max = 50)
+    @Indexed(unique = true)
     public String login;
     @NotBlank
     public String password;
@@ -42,8 +42,12 @@ public class User  implements UserDetails {
     public String phoneNumber;
     @Email
     @Size(max = 50)
+    @Indexed(unique = true)
     public String emailPro;
     public String company;
+    @Size(max = 8)
+    public String cin ;
+    public String address;
     public boolean activated = false ;
     public RoleName role ;
 

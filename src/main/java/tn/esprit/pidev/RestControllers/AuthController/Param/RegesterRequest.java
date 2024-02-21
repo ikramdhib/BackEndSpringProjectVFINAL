@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tn.esprit.pidev.entities.RoleName;
 
 @Data
 @AllArgsConstructor
@@ -19,4 +20,5 @@ public class RegesterRequest {
     public String firstName;
     public String login;
     public String password;
+    public RoleName roleName ;
 }
