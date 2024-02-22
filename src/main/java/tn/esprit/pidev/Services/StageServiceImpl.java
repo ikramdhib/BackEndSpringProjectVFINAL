@@ -10,6 +10,8 @@ import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class StageServiceImpl implements IServiceStage{
@@ -31,4 +33,23 @@ public class StageServiceImpl implements IServiceStage{
         log.info(stage.type.name()+"&&&&&&&&&&&&&&&&&&&");
 
     }
+
+    @Override
+    public void saveDemandeStage(String userId, String demandeStageContent) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID : " + userId));
+
+        Stage stage = new Stage();
+        stage.setUser(user);
+        stage.setDemandeS(demandeStageContent);
+
+        stageRepository.save(stage);
+    }
+
+    @Override
+    public Stage getStageByUserId(String userId) {
+        return stageRepository.findByUser_id(userId); // Assurez-vous d'adapter cela à votre modèle de données
+    }
+
+
 }

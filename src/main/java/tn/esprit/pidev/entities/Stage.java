@@ -16,8 +16,10 @@ public class Stage {
     @Id
     public String id;
     public String journal;
-    public String certificate;
-    public String report;
+    public String attestation;
+    public String rapport;
+    public String demandeS;
+    public String lettreAffect;
     public String nomSociete;
     public String numSociete;
     public String emailSociete;
@@ -25,8 +27,8 @@ public class Stage {
     public String prenomCoach;
     public String numCoach;
     public String emailCoach;
-    public String startAt;
-    public String endAt;
+    public Date startAt;
+    public Date endAt;
     public Type type;
 
     @DBRef

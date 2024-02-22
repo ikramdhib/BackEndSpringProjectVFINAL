@@ -7,9 +7,11 @@ import tn.esprit.pidev.entities.User;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements IServiceUser{
+
     public UserRepository userRepository;
+
     @Override
-    public User addUser(User user) {
-        return userRepository.save(user);
+    public User getUserById(String userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 }

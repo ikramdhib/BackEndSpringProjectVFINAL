@@ -10,6 +10,8 @@ import tn.esprit.pidev.Services.IServiceStage;
 import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
 
+import java.util.Optional;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600 , allowCredentials = "true")
 
@@ -39,6 +41,25 @@ public class StageRestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'utilisateur associé au stage est null.");
         }
     }
+
+    @PostMapping("/save-demande-stage/{userId}")
+    public ResponseEntity<String> saveDemandeStage(@PathVariable String userId, @RequestBody String demandeStageContent) {
+        stageService.saveDemandeStage(userId, demandeStageContent);
+        return ResponseEntity.ok("Demande de stage enregistrée avec succès.");
+    }
+
+    // Endpoint pour récupérer le stage associé à un utilisateur
+    @GetMapping("/afficher/{userId}")
+    public ResponseEntity<Stage> getStageByUtilisateurId(@PathVariable String userId) {
+        Stage stage = stageService.getStageByUserId(userId);
+
+        if (stage != null) {
+            return new ResponseEntity<>(stage, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 
 }
