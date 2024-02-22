@@ -15,6 +15,7 @@ import java.util.Date;
 public class Stage {
     public String id;
     public String journal;
+    public String attestation;
     public String certificate;
     public String report;
     public String startAt;
@@ -24,9 +25,17 @@ public class Stage {
     public String prenomCoach;
     public String numCoach;
     public String emailCoach;
+    private boolean etat;
     @DBRef
     private User user;
 
-
+    @DBRef
+    private User encadrant;
+    public boolean isEtat() {
+        return etat;
+    }
+    public void addEncadrant(User encadrant) {
+        this.encadrant = encadrant;
+    }
 
 }

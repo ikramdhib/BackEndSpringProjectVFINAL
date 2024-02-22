@@ -32,6 +32,11 @@ public class StageServiceImpl implements IServiceStage{
 
         Map<String, String> stageUserNames = new HashMap<>();
         for (Stage stage : stages) {
+            // Exclure les stages dont l'attribut 'etat' est true
+            if (stage.isEtat()) {
+                continue; // Passer au prochain stage
+            }
+
             String userName = (stage.getUser() != null) ? stage.getUser().getFirstName() + " " + stage.getUser().getLastName() : "Unknown";
             String stageInfo = "Stage(id=" + stage.getId() +
                     ", startAt=" + stage.getStartAt() +
@@ -59,29 +64,52 @@ public class StageServiceImpl implements IServiceStage{
                     + "Mot de passe : " + generateRandomPassword();
             emailService.sendEmail(encadrantEmail, subject, text);
 
-            // Après l'envoi de l'e-mail, mettre à jour les informations de l'encadrant et les supprimer de la table Stage
-            updateEncadrantInfoAndRemoveFromStage(stageId);
+            // Mettre à jour l'attribut 'etat' du stage à true
+            stage.setEtat(true);
+
+            // Sauvegarder les modifications du stage
+            stageRepository.save(stage);
         }
     }
+
+
 
     private String generateRandomPassword() {
         String password = UUID.randomUUID().toString().replace("-", "").substring(0, 8); // Obtenez une chaîne de 8 caractères
         return password;
     }
 
-    public void sendEmailToStudent(String stageId) {
+    public void sendEmailToStudent(String stageId, String reason) {
         Stage stage = stageRepository.findById(stageId).orElse(null);
         if (stage != null && stage.getUser() != null) {
             User user = stage.getUser();
             String studentEmail = user.getEmailPro(); // Suppose que l'e-mail professionnel de l'étudiant est utilisé
-            String subject = "Refus de validation de stage";
-            String text = "Bonjour " + user.getFirstName() + ",\n\n" +
-                    "Nous regrettons de vous informer que les données de votre stage n'ont pas été validées.\n" +
-                    "Veuillez prendre les mesures nécessaires pour corriger les problèmes éventuels.\n\n" +
-                    "Cordialement,\n" +
-                    "L'équipe de validation de stage";
-            emailService.sendEmail(studentEmail, subject, text);
+
+            // Vérifier si l'e-mail de l'étudiant est non null avant de l'utiliser
+            if (studentEmail != null) {
+                String subject = "Refus de validation de stage";
+                String text = "Bonjour " + user.getFirstName() + ",\n\n" +
+                        "Nous regrettons de vous informer que les données de votre stage n'ont pas été validées pour la raison suivante : " + reason + ".\n" +
+                        "Veuillez prendre les mesures nécessaires pour corriger les problèmes éventuels.\n\n" +
+                        "Cordialement,\n" +
+                        "L'équipe de validation de stage";
+                emailService.sendEmail(studentEmail, subject, text);
+                stage.setEtat(true);
+            } else {
+                // Gérer le cas où l'e-mail de l'utilisateur est null
+                // Vous pouvez par exemple enregistrer un journal d'erreur ou envoyer une notification à l'administrateur
+                // pour signaler que l'e-mail de l'utilisateur est manquant.
+            }
         }
+    }
+
+
+    @Override
+    public List<User> getStudentsByEncadrantId(String encadrantId) {
+        return stageRepository.findByUser_Id(encadrantId)
+                .stream()
+                .map(Stage::getUser)
+                .collect(Collectors.toList());
     }
     public void updateEncadrantInfoAndRemoveFromStage(String stageId) {
         Stage stage = stageRepository.findById(stageId).orElse(null);
@@ -103,27 +131,15 @@ public class StageServiceImpl implements IServiceStage{
             // Sauvegarder le nouvel utilisateur dans la table User
             userRepository.save(encadrant);
 
-            // Affecter ce nouvel encadrant au stage
-            stage.setUser(encadrant);
+            // Ajouter l'encadrant au stage sans supprimer l'affectation de l'étudiant
+            stage.addEncadrant(encadrant); // Méthode à implémenter dans la classe Stage
 
-            // Supprimer les informations de l'encadrant de la table Stage
-            stage.setNomCoach(null);
-            stage.setPrenomCoach(null);
-            stage.setNumCoach(null);
-            stage.setEmailCoach(null);
 
-            // Sauvegarder les modifications du stage avec le nouvel encadrant
+            // Sauvegarder les modifications du stage avec l'encadrant ajouté
             stageRepository.save(stage);
         }
     }
 
-    @Override
-    public List<User> getStudentsByEncadrantId(String encadrantId) {
-        return stageRepository.findByUser_Id(encadrantId)
-                .stream()
-                .map(Stage::getUser)
-                .collect(Collectors.toList());
-    }
 }
 
 

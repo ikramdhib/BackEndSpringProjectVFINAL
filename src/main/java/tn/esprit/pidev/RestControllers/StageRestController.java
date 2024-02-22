@@ -33,10 +33,10 @@ public class StageRestController {
                         return "Une erreur s'est produite lors de l'envoi de l'e-mail à l'encadrant.";
                 }
         }
-        @PostMapping("/sendEmailToStudent/{stageId}")
-        public String sendEmailToStudent(@PathVariable String stageId) {
+        @PostMapping("/sendEmailToStudent/{stageId}/{reason}")
+        public String sendEmailToStudent(@PathVariable String stageId,@PathVariable String reason) {
                 try {
-                        iServiceStage.sendEmailToStudent(stageId);
+                        iServiceStage.sendEmailToStudent(stageId,reason);
                         return "E-mail envoyé à l'étudiant avec succès.";
                 } catch (Exception e) {
                         e.printStackTrace();

@@ -7,8 +7,5 @@ import tn.esprit.pidev.entities.User;
 import java.util.List;
 
 public interface IServiceUser {
-    public List<User> getStudentsWithStage();
-    public List<User> getUsersWithStageData();
-    public List<User> getUsersWithStages() ;
-    public List<User> getUsersWithStagess();
+    public List<User> getStudentsBySupervisor(String encadrantId);
 }

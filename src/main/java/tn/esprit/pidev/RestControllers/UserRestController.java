@@ -13,27 +13,13 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
+
 public class UserRestController {
     public UserServiceImpl userService;
-    @GetMapping("/Gettt")
-    public ResponseEntity<List<User>> getStudentsWithStage() {
-        List<User> studentsWithStage = userService.getStudentsWithStage();
-        if (studentsWithStage.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(studentsWithStage, HttpStatus.OK);
-    }
-    @GetMapping("/users-with-stages")
-    public List<User> getUsersWithStages() {
-        return userService.getUsersWithStages();
-    }
-    @GetMapping("/withStages")
-    public ResponseEntity<List<User>> getUsersWithStagess() {
-        List<User> usersWithStages = userService.getUsersWithStages();
-        if (usersWithStages.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(usersWithStages, HttpStatus.OK);
+    @GetMapping("/students/{encadrantId}")
+    public List<User> getStudentsBySupervisor(@PathVariable String encadrantId) {
+        return userService.getStudentsBySupervisor(encadrantId);
     }
 
 

@@ -3,9 +3,13 @@ package tn.esprit.pidev.Services;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import tn.esprit.pidev.Repositories.StageRepository;
 import tn.esprit.pidev.Repositories.UserRepository;
+import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,32 +17,20 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserServiceImpl implements IServiceUser{
     public UserRepository userRepository;
-    public List<User> getUsersWithStages() {
-        List<User> usersWithStages = userRepository.findAll(); // ou une autre méthode de récupération
-        return usersWithStages.stream()
-                .map(this::mapUserToUserDtoWithStages)
-                .collect(Collectors.toList());
-    }
+    public StageRepository stageRepository;
 
-    private User mapUserToUserDtoWithStages(User user) {
-        User userDto = new User(user.getId(), user.getFirstName(), user.getLastName());
-        userDto.setStages(user.getStages());
-        return userDto;
-    }
+    public List<User> getStudentsBySupervisor(String encadrantId) {
+        User encadrant = userRepository.findById(encadrantId).orElse(null);
+        if (encadrant == null) {
+            // Gérer le cas où l'encadrant n'est pas trouvé, par exemple en lançant une exception
+            throw new IllegalArgumentException("Encadrant with ID " + encadrantId + " not found");
+        }
 
-    @Override
-    public List<User> getStudentsWithStage() {
-        return null;
+        List<Stage> stages = stageRepository.findByEncadrant(encadrant);
+        return stages.stream()
+                .map(Stage::getUser)
+                .toList();
     }
+}
 
-    public List<User> getUsersWithStageData() {
-        return userRepository.findAll();
-    }
 
-    public List<User> getUsersWithStagess() {
-        List<User> usersWithStages = userRepository.findAll(); // Assurez-vous que UserRepository prend en charge le chargement paresseux des relations
-        return usersWithStages.stream()
-                .peek(user -> user.getStages().size()) // Force le chargement des stages (lazy loading)
-                .collect(Collectors.toList());
-    }
-  }

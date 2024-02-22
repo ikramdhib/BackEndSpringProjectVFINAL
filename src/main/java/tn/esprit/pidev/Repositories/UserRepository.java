@@ -8,8 +8,9 @@ import tn.esprit.pidev.entities.User;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository extends MongoRepository<User,Integer> {
+public interface UserRepository extends MongoRepository<User,String> {
     List<User> findByStageIsNotNull();
 
     Optional<User> findById(ObjectId objectId);
+
 }
