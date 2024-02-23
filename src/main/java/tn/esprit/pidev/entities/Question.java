@@ -18,5 +18,6 @@ public class Question {
     public String id;
     public String titre;
     public String content;
+    public User user;
 
 }

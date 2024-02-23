@@ -9,8 +9,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Data
 @Document(collection = "commentaires")
-public class Commentaire {
+public class Reponse {
     public String id;
     public String content;
     public String questionId;
+    public User user;
 }

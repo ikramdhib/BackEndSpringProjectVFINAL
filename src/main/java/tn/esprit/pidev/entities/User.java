@@ -5,12 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Document(collection = "users")
 public class User {
-    public int id;
+    public String id;
     public String lastName;
     public String firstName;
     public String login;

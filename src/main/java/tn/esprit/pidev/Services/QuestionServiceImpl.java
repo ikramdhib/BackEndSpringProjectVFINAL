@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Repositories.QuestionRepository;
+import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.entities.Question;
+import tn.esprit.pidev.entities.User;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,11 +22,14 @@ import java.util.UUID;
 @AllArgsConstructor
 public class QuestionServiceImpl implements IServiceQuestion {
     private QuestionRepository questionRepository;
+    private UserRepository userRepository;
     private final Path rootLocation = Paths.get("images/");
 
 
     @Override
     public Question addQuestion(Question question) {
+        User user = userRepository.findById("65d5faf88ecbf72fd4d359f2").orElse(null);
+        question.setUser(user);
         return questionRepository.save(question);
     }
 
