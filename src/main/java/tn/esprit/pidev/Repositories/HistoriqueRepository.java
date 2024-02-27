@@ -2,11 +2,11 @@ package tn.esprit.pidev.Repositories;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import tn.esprit.pidev.entities.Reponse;
+import tn.esprit.pidev.entities.Historique;
 
 import java.util.List;
+
 @CrossOrigin(origins = "*")
-public interface ReponseRepository extends MongoRepository<Reponse,String> {
-    List<Reponse> findByQuestionId(String questionId);
-    List<Reponse> findByUserId(String userId);
+public interface HistoriqueRepository extends MongoRepository<Historique,String> {
+    List<Historique> findByUserId(String userId);
 }

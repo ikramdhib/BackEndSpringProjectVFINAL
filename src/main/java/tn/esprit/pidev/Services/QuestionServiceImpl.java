@@ -25,7 +25,6 @@ public class QuestionServiceImpl implements IServiceQuestion {
     private UserRepository userRepository;
     private final Path rootLocation = Paths.get("images/");
 
-
     @Override
     public Question addQuestion(Question question) {
         User user = userRepository.findById("65d5faf88ecbf72fd4d359f2").orElse(null);
@@ -62,8 +61,6 @@ public class QuestionServiceImpl implements IServiceQuestion {
 
         return imageUrl;
     }
-
-
     @Override
     public List<Question> getQuestion() {
         return questionRepository.findAll();
