@@ -15,7 +15,7 @@ import java.util.Date;
 public class Stage {
     public String id;
     public String journal;
-    public String attestation;
+
     public String certificate;
     public String report;
     public String startAt;
@@ -37,5 +37,13 @@ public class Stage {
     public void addEncadrant(User encadrant) {
         this.encadrant = encadrant;
     }
+    private byte[] attestationPdf;
 
+    public void setAttestationPdf(byte[] attestationPdf) {
+        this.attestationPdf = attestationPdf;
+    }
+
+    public byte[] getAttestationPdf() {
+        return attestationPdf;
+    }
 }

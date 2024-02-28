@@ -40,6 +40,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>7.2.0</version> <!-- Assurez-vous de spécifier une version compatible -->
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

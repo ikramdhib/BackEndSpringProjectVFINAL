@@ -27,10 +27,19 @@ public class UserServiceImpl implements IServiceUser{
         }
 
         List<Stage> stages = stageRepository.findByEncadrant(encadrant);
-        return stages.stream()
-                .map(Stage::getUser)
+        List<User> students = stages.stream()
+                .map(stage -> {
+                    User student = stage.getUser();
+                    student.setStageId(stage.getId()); // Ajouter l'ID du stage à l'étudiant
+                    return student;
+                })
                 .toList();
+        return students;
     }
+    public User findUserById(String userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
 }
 
 

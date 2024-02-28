@@ -33,7 +33,15 @@ public class User {
   // private Role role;
     @DBRef
     private List<Stage> stage;
+    private String stageId;
 
+    public String getStageId() {
+        return stageId;
+    }
+
+    public void setStageId(String stageId) {
+        this.stageId = stageId;
+    }
 
     public User(String id, String firstName, String lastName) {
       this.id=id;

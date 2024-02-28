@@ -8,4 +8,7 @@ import java.util.List;
 
 public interface IServiceUser {
     public List<User> getStudentsBySupervisor(String encadrantId);
-}
+    public User findUserById(String userId) ;
+
+    }
+

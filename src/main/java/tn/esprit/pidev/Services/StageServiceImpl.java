@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Repositories.RoleRepository;
 import tn.esprit.pidev.Repositories.StageRepository;
 import tn.esprit.pidev.Repositories.UserRepository;
@@ -12,6 +13,7 @@ import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
 import tn.esprit.pidev.entities.RoleName;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
@@ -139,7 +141,42 @@ public class StageServiceImpl implements IServiceStage{
             stageRepository.save(stage);
         }
     }
+    /////////////attestation
+    public boolean addAttestationToStage(String stageId, String encadrantId, String etudiantId, MultipartFile pdfFile) {
+        Optional<Stage> optionalStage = stageRepository.findById(stageId);
+        Optional<User> optionalEncadrant = userRepository.findById(encadrantId);
+        Optional<User> optionalEtudiant = userRepository.findById(etudiantId);
 
+        if (optionalStage.isEmpty() || optionalEncadrant.isEmpty() || optionalEtudiant.isEmpty()) {
+            return false; // Stage, encadrant ou étudiant non trouvé
+        }
+
+        Stage stage = optionalStage.get();
+        User encadrant = optionalEncadrant.get();
+        User etudiant = optionalEtudiant.get();
+
+        try {
+            byte[] pdfData = pdfFile.getBytes();
+            stage.setAttestationPdf(pdfData); // Enregistrez les données PDF dans la base de données
+            stage.setEncadrant(encadrant);
+            stage.setUser(etudiant);
+            stageRepository.save(stage);
+            return true; // Succès de l'ajout de l'attestation au stage
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false; // Erreur lors de la lecture du fichier PDF
+        }
+    }
+
+
+    @Override
+    public Stage saveStage(Stage stage) {
+        return stageRepository.save(stage);
+    }
+
+    public Stage findStageByUserAndEncadrant(User etudiant, User encadrant) {
+        return stageRepository.findByUserAndEncadrant(etudiant, encadrant);
+    }
 }
 
 
