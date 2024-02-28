@@ -27,5 +27,7 @@ public class PdfService {
         renderer.createPDF(outputStream);
 
         return ((ByteArrayOutputStream) outputStream).toByteArray();
+
     }
+
 }

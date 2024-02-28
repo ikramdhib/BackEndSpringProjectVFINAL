@@ -1,5 +1,6 @@
 package tn.esprit.pidev.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,6 @@ import java.util.Date;
 public class Stage {
     @Id
     public String id;
-    public String journal;
     public String attestation;
     public String rapport;
     public String demandeS;
@@ -33,4 +33,7 @@ public class Stage {
 
     @DBRef
     private User user; // Relation many-to-one vers User
+    @JsonBackReference
+    @DBRef
+    private Journal journal;
 }

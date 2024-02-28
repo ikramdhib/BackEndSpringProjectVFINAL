@@ -1,9 +1,11 @@
 package tn.esprit.pidev.RestControllers;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.Services.UserServiceImpl;
+import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
 
 @RestController
@@ -18,4 +20,5 @@ public class UserRestController {
         User user = userService.getUserById(userId);
         return ResponseEntity.ok(user);
     }
+
 }

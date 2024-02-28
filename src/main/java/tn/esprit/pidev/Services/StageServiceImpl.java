@@ -10,6 +10,7 @@ import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -47,9 +48,54 @@ public class StageServiceImpl implements IServiceStage{
     }
 
     @Override
-    public Stage getStageByUserId(String userId) {
-        return stageRepository.findByUser_id(userId); // Assurez-vous d'adapter cela à votre modèle de données
+    public List<Stage> getStagesByUserId(String userId) {
+        return stageRepository.findByUserId(userId);
     }
 
+    @Override
+    public Stage updateStage(String stageId, Stage updatedStage) {
+
+            Stage existingStage = stageRepository.findById(stageId).orElse(null);
+
+            if (existingStage != null) {
+                // Mettez à jour les champs nécessaires du stage existant avec les nouvelles valeurs
+                existingStage.setNomSociete(updatedStage.getNomSociete());
+                existingStage.setNumSociete(updatedStage.getNumSociete());
+                existingStage.setEmailSociete(updatedStage.getEmailSociete());
+                existingStage.setNomCoach(updatedStage.getNomCoach());
+                existingStage.setPrenomCoach(updatedStage.getPrenomCoach());
+                existingStage.setNumCoach(updatedStage.getNumCoach());
+                existingStage.setEmailCoach(updatedStage.getEmailCoach());
+                existingStage.setStartAt(updatedStage.getStartAt());
+                existingStage.setEndAt(updatedStage.getEndAt());
+                existingStage.setType(updatedStage.getType());
+                // Enregistrez les modifications dans la base de données
+                return stageRepository.save(existingStage);
+            }
+
+            return null; // Ou lancez une exception selon vos besoins
+        }
+
+    @Override
+    public void deleteStageById(String stageId) {
+        stageRepository.deleteById(stageId);
+    }
+
+    @Override
+    public Stage getStageById(String stageId) {
+        return stageRepository.findById(stageId).orElse(null);
+    }
+
+    @Override
+    public boolean isJournalAssociated(String stageId) {
+        Stage stage = stageRepository.findById(stageId).orElse(null);
+        boolean isAssociated = (stage != null && stage.getJournal() != null);
+
+        // Ajouter des logs de débogage
+        System.out.println("Stage ID: " + stageId);
+        System.out.println("Is Journal Associated: " + isAssociated);
+
+        return isAssociated;
+    }
 
 }

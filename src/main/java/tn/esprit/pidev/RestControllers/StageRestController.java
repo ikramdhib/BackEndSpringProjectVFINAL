@@ -10,6 +10,7 @@ import tn.esprit.pidev.Services.IServiceStage;
 import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -48,18 +49,43 @@ public class StageRestController {
         return ResponseEntity.ok("Demande de stage enregistrée avec succès.");
     }
 
-    // Endpoint pour récupérer le stage associé à un utilisateur
-    @GetMapping("/afficher/{userId}")
-    public ResponseEntity<Stage> getStageByUtilisateurId(@PathVariable String userId) {
-        Stage stage = stageService.getStageByUserId(userId);
 
-        if (stage != null) {
-            return new ResponseEntity<>(stage, HttpStatus.OK);
+    @GetMapping("/user/{userId}")
+    public List<Stage> getStagesByUserId(@PathVariable String userId) {
+        return stageService.getStagesByUserId(userId);
+    }
+
+    @PutMapping("/{stageId}")
+    public ResponseEntity<Stage> updateStage(@PathVariable String stageId, @RequestBody Stage updatedStage) {
+        Stage updated = stageService.updateStage(stageId, updatedStage);
+
+        if (updated != null) {
+            return new ResponseEntity<>(updated, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
+    @DeleteMapping("/{stageId}")
+    public ResponseEntity<?> deleteStage(@PathVariable String stageId) {
+        try {
+            // Appeler le service pour supprimer le stage
+            stageService.deleteStageById(stageId);
+            return new ResponseEntity<>("Stage supprimé avec succès", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Erreur lors de la suppression du stage", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
+    @GetMapping("/{stageId}")
+    public Stage getStageById(@PathVariable String stageId){
+       return stageService.getStageById(stageId);
+    }
+
+    @GetMapping("/isJournalAssociated/{stageId}")
+    public ResponseEntity<Boolean> isJournalAssociated(@PathVariable String stageId) {
+        boolean isAssociated = stageService.isJournalAssociated(stageId);
+        return ResponseEntity.ok(isAssociated);
+    }
 
 }

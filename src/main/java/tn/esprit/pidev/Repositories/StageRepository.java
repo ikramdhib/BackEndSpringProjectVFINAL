@@ -3,6 +3,9 @@ package tn.esprit.pidev.Repositories;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import tn.esprit.pidev.entities.Stage;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface StageRepository extends MongoRepository<Stage,String> {
-    Stage findByUser_id(String userId);
+    List<Stage> findByUserId(String userId);
 }
