@@ -10,9 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @Document(collection = "reclamations")
 public class Reclamation {
-    public int id;
+    public String id;
     public String from;
     public String to;
     public String body;
     public Objectif objective;
+    public User user;
 }

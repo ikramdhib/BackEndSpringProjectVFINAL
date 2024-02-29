@@ -3,6 +3,7 @@ package tn.esprit.pidev.RestControllers.AuthController;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,7 @@ public class UserRestController {
     public UserServiceImpl userService;
 
     @PostMapping("/addStudent")
-    public ResponseEntity<?> addStudentUser(@RequestParam(value = "file" , required = false)MultipartFile file ,
+    public ResponseEntity<?> addStudentUser(//@RequestParam(value = "file" , required = false)MultipartFile file ,
                                             @RequestParam("login") String login ,
                                             @RequestParam("password") String password ,
                                             @RequestParam("lastName") String lastName,
@@ -33,32 +34,29 @@ public class UserRestController {
                                             @RequestParam("address") String address,
                                             @RequestParam("cin") String cin ,
                                             @RequestParam("level") Level level,
-                                            @RequestParam("unvId") String unvId) throws IOException {
-        try {
-            User user = new User();
-            user.setLogin(login);
-            user.setPassword(password);
-            user.setCin(cin);
-            user.setAddress(address);
-            user.setLevel(level);
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setPhoneNumber(phoneNumber);
-            user.setUnvId(unvId);
+                                            @RequestParam("unvId") String unvId) {
+        User user = new User();
+        user.setLogin(login);
+        user.setPassword(password);
+        user.setCin(cin);
+        user.setAddress(address);
+        user.setLevel(level);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setPhoneNumber(phoneNumber);
+        user.setUnvId(unvId);
 
-            if (!file.isEmpty()) {
+          /*  if (!file.isEmpty()) {
                 String fileUrl = userService.saveImageForUsers(file);
                 user.setPic(fileUrl);
-            }
+                log.info(fileUrl);
+            }*/
 
-            User user1 = userService.addStudentUser(user);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(user1);
+        User user1 = userService.addStudentUser(user);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(user1);
 
-        }catch (IOException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("bad request");
-        }
+
     }
 
     @PostMapping("/addSupervisor")
@@ -116,4 +114,15 @@ public class UserRestController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("NO AVAILABLE USERS");
     }
+
+    @PutMapping("/updateUser/{id}") //a modifier
+    public ResponseEntity<?> updateUser( @PathVariable String id , @RequestBody User user){
+        User user1 = userService.updateUser(id,user);
+        if(user1!=null){
+            return ResponseEntity.status(HttpStatus.OK).body(user1);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CANNOT UPDATE THIS USER");
+    }
+
+
 }

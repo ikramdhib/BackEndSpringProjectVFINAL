@@ -60,6 +60,7 @@ public class UserServiceImpl implements IServiceUser {
             throw new IOException("l'image est null");
         }
         String filePath = file.getOriginalFilename();
+        log.info(filePath+"--------------------++++++++++++++++++");
         String fileExtention = filePath.substring(filePath.lastIndexOf("."));
         String fileName = UUID.randomUUID()+fileExtention;
 
@@ -128,6 +129,21 @@ public class UserServiceImpl implements IServiceUser {
     public void changePassword(User user , String newPassword){
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    @Override
+    public User updateUser(String id , User user) {
+        User user1 = userRepository.findById(id).orElse(null);
+        if(user1.role.equals(RoleName.ENCADRANT)){
+            user1.setAddress(user.address);
+            user1.setPhoneNumber(user.phoneNumber);
+            user1.setPic(user.pic);
+        }else{
+            user1.setAddress(user.address);
+            user1.setPhoneNumber(user.phoneNumber);
+            user1.setPic(user.pic);
+        }
+        return userRepository.save(user1);
     }
 
 }

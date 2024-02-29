@@ -28,4 +28,6 @@ public interface IServiceUser {
     String generateToken(User user);
 
     void changePassword(User user , String newPassword);
+
+    User updateUser(String id , User user);
 }

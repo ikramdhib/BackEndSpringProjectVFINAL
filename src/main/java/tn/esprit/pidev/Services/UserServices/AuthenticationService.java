@@ -77,7 +77,7 @@ log.info(String.valueOf(userRepository.findByLogin(request.getLogin())));
         final String refreshToken ;
         final String userLogin ;
         if(authHeader == null ||!authHeader.startsWith("Bearer ")){
-            return;
+            return ;
         }
         refreshToken = authHeader.substring(7);
         userLogin=jwtService.extractLogin(refreshToken);

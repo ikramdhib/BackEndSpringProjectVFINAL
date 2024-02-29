@@ -1,11 +1,13 @@
 package tn.esprit.pidev.RestControllers.AuthController;
 
 import jakarta.mail.MessagingException;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.Configurations.JwtService;
@@ -16,10 +18,11 @@ import tn.esprit.pidev.Services.UserServices.UserListnner.MailingForgetPassListn
 import tn.esprit.pidev.Services.UserServices.UserServiceImpl;
 import tn.esprit.pidev.entities.User;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Optional;
-import java.util.UUID;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @RestController
 @AllArgsConstructor
@@ -33,6 +36,7 @@ public class AuthenticationRestController {
     public AuthenticationService authenticationService;
     public MailingForgetPassListner mailingForgetPassListner;
     private JwtService jwtService;
+    public ServletContext context;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticateResponse> register(
@@ -65,6 +69,7 @@ public class AuthenticationRestController {
 
     @PostMapping("/refresh-token")
     public void refreshToken(HttpServletRequest request , HttpServletResponse response)throws IOException{
+        log.info("hello from refresh token it work or not ?");
         authenticationService.refreshToken(request,response);
     }
 
@@ -72,8 +77,8 @@ public class AuthenticationRestController {
 
 
     @PostMapping("/password-reset-request")
-    public String resetPasswordRequest(@RequestBody PasswordResetUtil passwordResetRequest ,
-                                       HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<?> resetPasswordRequest(@RequestBody PasswordResetUtil passwordResetRequest
+                                       ) throws MessagingException, UnsupportedEncodingException {
         User user = userService.findByLoginLike(
                 passwordResetRequest.getLogin());
         String passwordRrl ="";
@@ -84,14 +89,16 @@ public class AuthenticationRestController {
 
             boolean isTokenValid= userService.createPasswordResetToken(passwordResetToken , user);
             if(isTokenValid){
-                passwordRrl=passwordResetEmailLink(user,applicationUrl(request),passwordResetToken);
+                passwordRrl=passwordResetEmailLink(user,passwordResetToken);
             }
+
+            return ResponseEntity.status(HttpStatus.OK).body(user);
         }
-        return passwordRrl;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("YOU CANT GET A LINK");
     }
-    public String passwordResetEmailLink(User user , String appUrl ,
+    public String passwordResetEmailLink(User user  ,
                                          String passwordToken) throws MessagingException, UnsupportedEncodingException {
-        String url = appUrl+"/api/v1/auth/reset-password?token="
+        String url = "http://localhost:4200/ChangePassword?token="
                 +passwordToken;
         mailingForgetPassListner.sendPasswordResetVerification(url ,user);
         log.info("Click the link to reset your password :  {}", url);
@@ -99,7 +106,7 @@ public class AuthenticationRestController {
     }
 
     @PostMapping("/reset-password")
-    public String restPassword(@RequestBody PasswordResetUtil passwordResetUtil,
+    public ResponseEntity<?> restPassword(@RequestBody PasswordResetUtil passwordResetUtil,
                                @RequestParam("token") String token){
         User user =
                 userService.findByLoginLike(jwtService.extractLogin(token));
@@ -107,9 +114,9 @@ public class AuthenticationRestController {
 
         if(user!=null){
             userService.changePassword(user, passwordResetUtil.getNewPassword());
-            return "password reset success";
+            return ResponseEntity.status(HttpStatus.OK).body(user);
         }
-        return "Invalid password reset token";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CONNOT UPDATE PASSWORD");
     }
 
 
@@ -117,5 +124,11 @@ public class AuthenticationRestController {
         return "http://"+request.getServerName()+":"
                 +request.getServerPort()+request.getContextPath();
     }
+    @GetMapping("/image/{image}")
+    public byte[] getPhoto(@PathVariable("image") String image) throws Exception{
+
+        return Files.readAllBytes(Paths.get(context.getRealPath("/images/")+image));
+    }
+
 
 }
