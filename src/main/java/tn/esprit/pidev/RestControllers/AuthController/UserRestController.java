@@ -7,13 +7,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tn.esprit.pidev.Services.UserServices.CloudinaryService;
 import tn.esprit.pidev.Services.UserServices.UserServiceImpl;
 import tn.esprit.pidev.entities.Level;
 import tn.esprit.pidev.entities.RoleName;
 import tn.esprit.pidev.entities.User;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -23,6 +27,8 @@ import java.util.List;
 public class UserRestController {
 
     public UserServiceImpl userService;
+
+    public CloudinaryService cloudinaryService ;
 
     @PostMapping("/addStudent")
     public ResponseEntity<?> addStudentUser(//@RequestParam(value = "file" , required = false)MultipartFile file ,
@@ -46,6 +52,15 @@ public class UserRestController {
         user.setPhoneNumber(phoneNumber);
         user.setUnvId(unvId);
 
+
+       /* BufferedImage bi = ImageIO.read(file.getInputStream());
+
+        if(bi ==null){
+            return new ResponseEntity<>("Image non valide!", HttpStatus.BAD_REQUEST);
+        }*/
+     //   Map result = cloudinaryService.upload(file);
+
+      //  user.setPic((String) result.get("url"));
           /*  if (!file.isEmpty()) {
                 String fileUrl = userService.saveImageForUsers(file);
                 user.setPic(fileUrl);
@@ -82,10 +97,21 @@ public class UserRestController {
             user.setEmailPro(emailPro);
             user.setCompany(company);
 
-            if (!file.isEmpty()) {
+
+            BufferedImage bi = ImageIO.read(file.getInputStream());
+
+            if(bi ==null){
+                return new ResponseEntity<>("Image non valide!", HttpStatus.BAD_REQUEST);
+            }
+
+            Map result = cloudinaryService.upload(file);
+
+             user.setPic((String) result.get("url"));
+
+            /*if (!file.isEmpty()) {
                 String fileUrl = userService.saveImageForUsers(file);
                 user.setPic(fileUrl);
-            }
+            }*/
 
             User user1 = userService.addSupervisor(user);
             return ResponseEntity.status(HttpStatus.OK)
@@ -123,6 +149,7 @@ public class UserRestController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CANNOT UPDATE THIS USER");
     }
+
 
 
 }
