@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.Date;
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -19,5 +21,5 @@ public class Question {
     public String titre;
     public String content;
     public User user;
-
+    private List<Tag> tags;
 }

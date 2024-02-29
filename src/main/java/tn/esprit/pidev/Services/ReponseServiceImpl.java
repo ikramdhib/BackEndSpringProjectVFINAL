@@ -54,17 +54,19 @@ public class ReponseServiceImpl implements IServiceReponse {
         // Obtenir toutes les réponses de l'utilisateur statique
         List<Reponse> userResponses = reponseRepository.findByUserId(userId);
         // Compter le nombre de réponses par ID de question
-        Map<String,Long> questionCount = userResponses.stream()
+        Map<String,Long> questionCount = userResponses.stream() //démarre un flux stream sul la liste de réponse
                 .collect((Collectors.groupingBy(Reponse::getQuestionId,Collectors.counting())));
-        List<String> mostAnswerdQuestionId = questionCount.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .map(Map.Entry::getKey)
+        // collecter les éléments d'une map clé: Id de la question value : nb de fois que chaque question a été répondue
+        List<String> mostAnswerdQuestionId = questionCount.entrySet().stream() // lancer une deuxième flux sur le map questionCount
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) //filtrer le flux des entrées par le nb de réponses par ordre décroissant
+                .map(Map.Entry::getKey) //un flux composé des entrées de la map questionCount //key : QuestionId
                 .limit(4) // Limiter aux 4 premiers
-                .collect(Collectors.toList());
-        List<Question> topQuestions = mostAnswerdQuestionId.stream()
-                .map(questionId -> questionRepository.findById(questionId).orElse(null))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()); //collecte les identifiants d'une quesstion dans une liste
+        //retourne la liste de questions les plus répondues
+        List<Question> topQuestions = mostAnswerdQuestionId.stream() //démarrer un flux de stream sur mostAnswerdQuestionId
+                .map(questionId -> questionRepository.findById(questionId).orElse(null)) //Pour chaque identifiant de question, recherche la question correspondante dans questionRepository par son identifiant.
+                .filter(Objects::nonNull) //filtrer le flux en exclurant les valeurs null
+                .collect(Collectors.toList()); //collecter les questions restantes dans une liste
 
         return topQuestions;
     }
