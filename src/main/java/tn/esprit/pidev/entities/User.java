@@ -32,4 +32,5 @@ public class User {
 
     @DBRef
     private List<Stage> stages; // Relation one-to-many vers Stage
+
 }
