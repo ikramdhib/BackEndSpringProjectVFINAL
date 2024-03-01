@@ -1,13 +1,14 @@
 package tn.esprit.pidev.RestControllers.AuthController;
 
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Services.UserServices.CloudinaryService;
+import tn.esprit.pidev.Services.UserServices.PasswordReset;
 import tn.esprit.pidev.Services.UserServices.UserServiceImpl;
 import tn.esprit.pidev.entities.Level;
 import tn.esprit.pidev.entities.RoleName;
@@ -16,6 +17,7 @@ import tn.esprit.pidev.entities.User;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -175,6 +177,36 @@ public class UserRestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("USER NOT FOUND");
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
+    @PostMapping("/requestOfChangingPass/{id}")
+    public ResponseEntity<?> requestOfChangingPass(@PathVariable String id ,
+                                                   @RequestBody PasswordReset passwordReset) throws MessagingException, UnsupportedEncodingException {
+
+        String code = userService.confirmUpdatePass(id , passwordReset.getNewPassword() , passwordReset.getOldPassword() );
+        log.info(code+"777777777777777777777777777777777777777777777777777777777777");
+        PasswordReset passwordReset1 = new PasswordReset();
+        if(code!=null){
+            passwordReset1.setCodeSent(code);
+            return ResponseEntity.status(HttpStatus.OK).body(passwordReset1);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("null");
+    }
+
+    @PutMapping("/changePassword/{id}")
+    public ResponseEntity<?> changePassword(
+            @PathVariable String id ,
+            @RequestBody PasswordReset newPasswordReset){
+        log.info(newPasswordReset.getCodeInput()+"@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        log.info(newPasswordReset.getCodeSent()+"@@@@@@@@@@@@@@@@@@@@@");
+        User user =null ;
+        if(newPasswordReset.getCodeInput().equals(newPasswordReset.getCodeSent())){
+
+            user = userService.updatePassword(id,newPasswordReset.getNewPassword());
+            return ResponseEntity.status(HttpStatus.OK).body(user);
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("TRY AGAIN");
     }
 
 

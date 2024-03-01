@@ -1,5 +1,6 @@
 package tn.esprit.pidev.Services.UserServices;
 
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,17 +9,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Configurations.JwtService;
 import tn.esprit.pidev.Repositories.UserRepository;
+import tn.esprit.pidev.Services.UserServices.UserListnner.MailingForgetPassListner;
 import tn.esprit.pidev.entities.User;
 
 import tn.esprit.pidev.entities.RoleName;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -27,13 +31,55 @@ import java.util.UUID;
 public class UserServiceImpl implements IServiceUser {
 
     public CloudinaryService cloudinaryService;
+
+    private  MailingForgetPassListner mailingForgetPassListner;
+    private  UserRepository userRepository;
+    private  PasswordEncoder passwordEncoder;
     @Override
     public User getUserById(String id) {
         return userRepository.findById(id).orElse(null);
     }
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Override
+    public User updatePassword(String id, String newPass)  {
+
+        User user = userRepository.findById(id).orElse(null);
+        if(user!=null){
+            user.setPassword(passwordEncoder.encode(newPass));
+        }
+        return userRepository.save(user);
+    }
+
+
+    public String confirmUpdatePass(String id, String newPass , String oldPass) throws MessagingException, UnsupportedEncodingException {
+
+        User user = userRepository.findById(id).orElse(null);
+
+        StringBuilder codeBuilder = new StringBuilder();
+        if(user!=null){
+            log.info("user1");
+            if(passwordEncoder.matches(newPass,user.getPassword())
+            || !passwordEncoder.matches(oldPass,user.getPassword())){
+                log.info("trueeee1");
+                return null;
+            }
+            //generer le code de verification
+            Random random = new Random();
+
+            // Générer un code de 6 chiffres
+            for (int i = 0; i < 6; i++) {
+                int digit = random.nextInt(10); // Générer un chiffre aléatoire entre 0 et 9
+                codeBuilder.append(digit); // Ajouter le chiffre à la chaîne de caractères
+            }
+            log.info("trueeee2");
+            mailingForgetPassListner.sendVerificationEmail(user, codeBuilder);
+
+
+        }
+        return codeBuilder.toString() ;
+    }
+
+
 
     private final JwtService jwtService;
     private final Path rootLocation = Paths.get("images");

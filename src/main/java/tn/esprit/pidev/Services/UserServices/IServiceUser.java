@@ -1,5 +1,6 @@
 package tn.esprit.pidev.Services.UserServices;
 
+import jakarta.mail.MessagingException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.RestControllers.AuthController.Param.AuthenticateResponse;
@@ -9,6 +10,7 @@ import tn.esprit.pidev.entities.RoleName;
 import tn.esprit.pidev.entities.User;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 public interface IServiceUser {
@@ -32,4 +34,7 @@ public interface IServiceUser {
     User updateUser(String id , User user);
 
     User getUserById(String id);
+
+
+    User updatePassword(String id , String newPass) ;
 }
