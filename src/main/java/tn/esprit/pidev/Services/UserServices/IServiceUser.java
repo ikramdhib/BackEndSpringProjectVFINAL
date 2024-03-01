@@ -30,4 +30,6 @@ public interface IServiceUser {
     void changePassword(User user , String newPassword);
 
     User updateUser(String id , User user);
+
+    User getUserById(String id);
 }

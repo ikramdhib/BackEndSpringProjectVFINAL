@@ -26,6 +26,12 @@ import java.util.UUID;
 @Slf4j
 public class UserServiceImpl implements IServiceUser {
 
+    public CloudinaryService cloudinaryService;
+    @Override
+    public User getUserById(String id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -134,15 +140,34 @@ public class UserServiceImpl implements IServiceUser {
     @Override
     public User updateUser(String id , User user) {
         User user1 = userRepository.findById(id).orElse(null);
+
         if(user1.role.equals(RoleName.ENCADRANT)){
+            if(user.pic!=null){
+                try {
+                    cloudinaryService.delete(user.pic);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             user1.setAddress(user.address);
             user1.setPhoneNumber(user.phoneNumber);
             user1.setPic(user.pic);
+            user1.setEmailPro(user.emailPro);
+            user1.setCin(user.cin);
         }else{
+            if(user.pic!=null){
+                try {
+                    cloudinaryService.delete(user.pic);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             user1.setAddress(user.address);
             user1.setPhoneNumber(user.phoneNumber);
+            user1.setCin(user.cin);
             user1.setPic(user.pic);
         }
+        log.info(user1.pic);
         return userRepository.save(user1);
     }
 

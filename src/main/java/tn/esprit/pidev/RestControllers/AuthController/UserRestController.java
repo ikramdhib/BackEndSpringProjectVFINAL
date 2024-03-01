@@ -142,12 +142,39 @@ public class UserRestController {
     }
 
     @PutMapping("/updateUser/{id}") //a modifier
-    public ResponseEntity<?> updateUser( @PathVariable String id , @RequestBody User user){
+    public ResponseEntity<?> updateUser( @PathVariable String id , @RequestParam(value = "file" , required = false) MultipartFile file ,
+                                         @RequestParam(value = "phoneNumber" , required = false) String phoneNumber ,
+                                         @RequestParam(value = "address" , required = false) String address,
+                                         @RequestParam(value = "cin" , required = false) String cin ,
+                                         @RequestParam(value = "emailPro" , required = false) String emailPro ) throws IOException {
+
+        User user = new User();
+
+        if(file!=null){
+            Map result = cloudinaryService.upload(file);
+
+            user.setPic((String) result.get("url"));
+        }
+        user.setPhoneNumber(phoneNumber);
+        user.setCin(cin);
+        user.setAddress(address);
+        user.setEmailPro(emailPro);
+
+
         User user1 = userService.updateUser(id,user);
         if(user1!=null){
             return ResponseEntity.status(HttpStatus.OK).body(user1);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CANNOT UPDATE THIS USER");
+    }
+
+    @GetMapping("/getUser/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable String id){
+        User user = userService.getUserById(id);
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("USER NOT FOUND");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
 
