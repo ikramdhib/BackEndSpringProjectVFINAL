@@ -55,6 +55,7 @@ public class StageRestController {
         return stageService.getStagesByUserId(userId);
     }
 
+
     @PutMapping("/{stageId}")
     public ResponseEntity<Stage> updateStage(@PathVariable String stageId, @RequestBody Stage updatedStage) {
         Stage updated = stageService.updateStage(stageId, updatedStage);
@@ -87,5 +88,6 @@ public class StageRestController {
         boolean isAssociated = stageService.isJournalAssociated(stageId);
         return ResponseEntity.ok(isAssociated);
     }
+
 
 }

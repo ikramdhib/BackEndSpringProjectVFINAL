@@ -42,5 +42,10 @@ public class JournalRestController {
         }
     }
 
+    @GetMapping("/{journalId}")
+    public Journal getJournal(@PathVariable String journalId){
+        return serviceJournal.getJournal(journalId);
+    }
+
 
 }

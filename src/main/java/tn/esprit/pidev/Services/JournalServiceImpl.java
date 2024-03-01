@@ -43,4 +43,9 @@ public class JournalServiceImpl implements IServiceJournal{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Stage not found for ID: " + stageId);
         }
     }
+
+    @Override
+    public Journal getJournal(String journalId) {
+        return journalRepository.findById(journalId).orElse(null);
+    }
 }

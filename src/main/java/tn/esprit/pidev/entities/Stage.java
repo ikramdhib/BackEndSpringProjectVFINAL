@@ -31,9 +31,13 @@ public class Stage {
     public Date endAt;
     public Type type;
 
+    private String reportDate;
+    private String journalDate;
+    private String attestationDate;
+
     @DBRef
     private User user; // Relation many-to-one vers User
-    @JsonBackReference
+
     @DBRef
     private Journal journal;
 }

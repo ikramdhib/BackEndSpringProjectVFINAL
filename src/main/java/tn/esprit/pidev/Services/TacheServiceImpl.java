@@ -9,6 +9,7 @@ import tn.esprit.pidev.Repositories.TacheRepository;
 import tn.esprit.pidev.entities.Journal;
 import tn.esprit.pidev.entities.Tache;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,5 +37,15 @@ public class TacheServiceImpl implements IServiceTache {
             // Utilisez ResponseStatusException pour générer une réponse HTTP avec un statut spécifique
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Le journal avec l'ID " + journalId + " n'a pas été trouvé");
         }
+    }
+
+    @Override
+    public List<Tache> getTachesByStageId(String stageId) {
+        return tacheRepository.findByJournal_Stage_Id(stageId);
+    }
+
+    @Override
+    public List<Tache> getTachesByJournalId(String journalId) {
+        return tacheRepository.findByJournal_Id(journalId);
     }
 }
