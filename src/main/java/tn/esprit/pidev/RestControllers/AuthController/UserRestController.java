@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tn.esprit.pidev.RestControllers.AuthController.Param.ResponseModel;
 import tn.esprit.pidev.Services.UserServices.CloudinaryService;
 import tn.esprit.pidev.Services.UserServices.PasswordReset;
 import tn.esprit.pidev.Services.UserServices.UserServiceImpl;
@@ -30,10 +31,12 @@ public class UserRestController {
 
     public UserServiceImpl userService;
 
+    private final  ResponseModel responseModel = new ResponseModel();
+
     public CloudinaryService cloudinaryService ;
 
     @PostMapping("/addStudent")
-    public ResponseEntity<?> addStudentUser(//@RequestParam(value = "file" , required = false)MultipartFile file ,
+    public ResponseEntity<?> addStudentUser(@RequestParam(value = "file" , required = false)MultipartFile file ,
                                             @RequestParam("login") String login ,
                                             @RequestParam("password") String password ,
                                             @RequestParam("lastName") String lastName,
@@ -42,7 +45,7 @@ public class UserRestController {
                                             @RequestParam("address") String address,
                                             @RequestParam("cin") String cin ,
                                             @RequestParam("level") Level level,
-                                            @RequestParam("unvId") String unvId) {
+                                            @RequestParam("unvId") String unvId) throws IOException {
         User user = new User();
         user.setLogin(login);
         user.setPassword(password);
@@ -55,14 +58,14 @@ public class UserRestController {
         user.setUnvId(unvId);
 
 
-       /* BufferedImage bi = ImageIO.read(file.getInputStream());
+        BufferedImage bi = ImageIO.read(file.getInputStream());
 
         if(bi ==null){
             return new ResponseEntity<>("Image non valide!", HttpStatus.BAD_REQUEST);
-        }*/
-     //   Map result = cloudinaryService.upload(file);
+        }
+        Map result = cloudinaryService.upload(file);
 
-      //  user.setPic((String) result.get("url"));
+        user.setPic((String) result.get("url"));
           /*  if (!file.isEmpty()) {
                 String fileUrl = userService.saveImageForUsers(file);
                 user.setPic(fileUrl);
@@ -103,7 +106,8 @@ public class UserRestController {
             BufferedImage bi = ImageIO.read(file.getInputStream());
 
             if(bi ==null){
-                return new ResponseEntity<>("Image non valide!", HttpStatus.BAD_REQUEST);
+                responseModel.setResponse("Image non valide!");
+                return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
             }
 
             Map result = cloudinaryService.upload(file);
@@ -120,17 +124,22 @@ public class UserRestController {
                     .body(user1);
 
         }catch (IOException e){
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("bad Request");
+            responseModel.setResponse("BAD REQUEST");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
         }
     }
 
     @PutMapping("/blockUser/{id}")
     public ResponseEntity<?> blockUser(@PathVariable String id){
+
         if(userService.blockUser(id)){
-            return ResponseEntity.status(HttpStatus.OK).body("USER BLOCKED");
+
+            responseModel.setResponse("USER BLOCKED");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("USER NOT BLOCKE");
+        responseModel.setResponse("TRY AGAIN");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
     }
 
     @GetMapping("/users/{roleName}")
@@ -140,7 +149,8 @@ public class UserRestController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(users);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("NO AVAILABLE USERS");
+        responseModel.setResponse("NO AVAILABLE USERS");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
     }
 
     @PutMapping("/updateUser/{id}") //a modifier
@@ -167,14 +177,18 @@ public class UserRestController {
         if(user1!=null){
             return ResponseEntity.status(HttpStatus.OK).body(user1);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CANNOT UPDATE THIS USER");
+
+        responseModel.setResponse("CANNOT UPDATE THIS USER");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
     }
 
     @GetMapping("/getUser/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id){
+
         User user = userService.getUserById(id);
         if(user == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("USER NOT FOUND");
+            responseModel.setResponse("USER NOT FOUND");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
@@ -190,7 +204,8 @@ public class UserRestController {
             passwordReset1.setCodeSent(code);
             return ResponseEntity.status(HttpStatus.OK).body(passwordReset1);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("null");
+        responseModel.setResponse("TRY AGAIN");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
     }
 
     @PutMapping("/changePassword/{id}")
@@ -205,8 +220,8 @@ public class UserRestController {
             user = userService.updatePassword(id,newPasswordReset.getNewPassword());
             return ResponseEntity.status(HttpStatus.OK).body(user);
         }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("TRY AGAIN");
+        responseModel.setResponse("TRY AGAIN");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
     }
 
 
