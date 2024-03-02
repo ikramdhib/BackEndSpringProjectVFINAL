@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface UserRepository extends MongoRepository<User,String> {
     List<User> findByStageIsNotNull();
+    User findUserById(String id);
 
-    Optional<User> findById(ObjectId objectId);
 
 }

@@ -19,4 +19,17 @@ public class EmailService {
         message.setText(text);
         emailSender.send(message);
     }
+    public void sendTaskValidatedEmail(String recipientEmail) {
+        String subject = "Votre tâche a été validée";
+        String body = "Votre tâche a été validée avec succès.";
+
+        sendEmail(recipientEmail, subject, body);
+    }
+
+    public void sendTaskRejectedEmail(String recipientEmail, String rejectionReason) {
+        String subject = "Votre tâche a été rejetée";
+        String body = "Votre tâche a été rejetée pour la raison suivante : " + rejectionReason;
+
+        sendEmail(recipientEmail, subject, body);
+    }
 }

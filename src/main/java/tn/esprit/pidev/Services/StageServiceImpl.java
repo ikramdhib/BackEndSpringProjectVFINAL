@@ -14,6 +14,11 @@ import tn.esprit.pidev.entities.User;
 import tn.esprit.pidev.entities.RoleName;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
@@ -173,10 +178,80 @@ public class StageServiceImpl implements IServiceStage{
     public Stage saveStage(Stage stage) {
         return stageRepository.save(stage);
     }
+    public Stage findStageById(String stageId) {
+        // Implémentation de la méthode pour trouver le stage par son identifiant
+        return stageRepository.findById(stageId).orElse(null);
+    }
 
     public Stage findStageByUserAndEncadrant(User etudiant, User encadrant) {
         return stageRepository.findByUserAndEncadrant(etudiant, encadrant);
     }
+    /////////////TimeLineDateeeee
+    public List<String[]> getStudentTimeline(String studentId) {
+        List<Stage> stages = stageRepository.findByUserId(studentId);
+        List<String[]> timeline = new ArrayList<>();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (Stage stage : stages) {
+            // Convertir les objets Date en chaînes de caractères représentant des dates
+            String startDateStr = dateFormat.format(stage.getStartAt());
+            String endDateStr = dateFormat.format(stage.getEndAt());
+
+            // Parse la date de début
+            LocalDate startDate = LocalDate.parse(startDateStr);
+            // Parse la date de fin
+            LocalDate endDate = LocalDate.parse(endDateStr);
+
+            // Ajoute une semaine à la date de fin pour obtenir la date de dépôt du rapport et du journal
+            LocalDate reportDate = endDate.plusWeeks(1);
+
+            // Ajoute les dates formatées à la liste de la timeline
+            String[] timelineEntry = {startDate.toString(), endDate.toString(), reportDate.toString()};
+            timeline.add(timelineEntry);
+        }
+        return timeline;
+    }
+    ////////
+    public List<String[]> getStudentTimeline(String studentId, String stageId) {
+        Optional<User> optionalUser = userRepository.findById(studentId);
+        Optional<Stage> optionalStage = stageRepository.findById(stageId);
+
+        if (optionalUser.isEmpty() || optionalStage.isEmpty()) {
+            return null; // Gérer le cas où l'utilisateur ou le stage n'existe pas
+        }
+
+        User student = optionalUser.get();
+        Stage stage = optionalStage.get();
+
+        if (!stage.getUser().getId().equals(studentId)) {
+            return null; // Gérer le cas où le stage ne correspond pas à l'utilisateur
+        }
+
+        List<String[]> timeline = new ArrayList<>();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Convertir les dates en chaînes de caractères
+        LocalDate startDate = stage.getStartAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endDate = stage.getEndAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate journalDate = endDate.plusWeeks(2);
+        LocalDate attestationDate = endDate.plusWeeks(1);
+        LocalDate reportDate = endDate.plusWeeks(2);
+        // Ajouter les dates formatées à la liste de la timeline
+        String[] timelineEntry = {startDate.format(dateFormatter), endDate.format(dateFormatter), journalDate.format(dateFormatter), attestationDate.format(dateFormatter), reportDate.format(dateFormatter)};
+        timeline.add(timelineEntry);
+
+        return timeline;
+    }
+    @Override
+    public List<Stage> getStagesByUserId(String userId) {
+        return stageRepository.findByUserId(userId);
+    }
+
+    public List<Stage> getStagesByEncadrantId(String encadrantId) {
+        return stageRepository.findByEncadrantId(encadrantId);
+    }
+
 }
 
 
