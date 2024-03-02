@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.Services.IServiceTache;
+import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.Tache;
 
 import java.util.List;
@@ -44,6 +45,17 @@ public class TacheRestController {
             return new ResponseEntity<>(taches, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{tacheId}")
+    public ResponseEntity<Tache> updateTache(@PathVariable String tacheId, @RequestBody Tache updatedTache) {
+        Tache updated = serviceTache.updateTache(tacheId, updatedTache);
+
+        if (updated != null) {
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

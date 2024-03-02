@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 import tn.esprit.pidev.Repositories.JournalRepository;
 import tn.esprit.pidev.Repositories.TacheRepository;
 import tn.esprit.pidev.entities.Journal;
+import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.Tache;
 
 import java.util.List;
@@ -47,5 +48,19 @@ public class TacheServiceImpl implements IServiceTache {
     @Override
     public List<Tache> getTachesByJournalId(String journalId) {
         return tacheRepository.findByJournal_Id(journalId);
+    }
+
+    @Override
+    public Tache updateTache(String tacheId, Tache updatedTache) {
+        Tache existingTache = tacheRepository.findById(tacheId).orElse(null);
+
+        if (existingTache != null) {
+            // Mettez à jour les champs nécessaires du stage existant avec les nouvelles valeurs
+            existingTache.setDate(updatedTache.getDate());
+            existingTache.setLibelle(updatedTache.getLibelle());
+            // Enregistrez les modifications dans la base de données
+            return tacheRepository.save(existingTache);
+        }
+        return null; // Ou lancez une exception selon vos besoins
     }
 }
