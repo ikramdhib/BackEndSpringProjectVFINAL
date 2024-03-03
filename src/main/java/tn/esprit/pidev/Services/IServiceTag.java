@@ -9,4 +9,5 @@ public interface IServiceTag {
     public List<Tag> getAllTags();
     public void deleteTag(String tagId);
     public List<String> getAllTagNames();
+
 }

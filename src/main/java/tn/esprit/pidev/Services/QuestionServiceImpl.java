@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Repositories.QuestionRepository;
+import tn.esprit.pidev.Repositories.TagRepository;
 import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.entities.Question;
+import tn.esprit.pidev.entities.Tag;
 import tn.esprit.pidev.entities.User;
 
 import java.io.IOException;
@@ -17,18 +19,34 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class QuestionServiceImpl implements IServiceQuestion {
     private QuestionRepository questionRepository;
     private UserRepository userRepository;
+    private TagRepository tagRepository;
     private final Path rootLocation = Paths.get("images/");
 
     @Override
     public Question addQuestion(Question question) {
         User user = userRepository.findById("65d5faf88ecbf72fd4d359f2").orElse(null);
         question.setUser(user);
+        if (question.getTags() != null) {
+            List<Tag> processedTags = question.getTags().stream()
+                    .map(tag -> tagRepository.findByName(tag.getName())
+                            .map(existingTag -> {
+                                existingTag.setUsageCount(existingTag.getUsageCount() + 1);
+                                return existingTag;
+                            })
+                            .orElseGet(() -> {
+                                tag.setUsageCount(1);
+                                return tagRepository.save(tag);
+                            }))
+                    .collect(Collectors.toList());
+            question.setTags(processedTags);
+        }
         return questionRepository.save(question);
     }
 

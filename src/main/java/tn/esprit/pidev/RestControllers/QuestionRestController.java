@@ -5,21 +5,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tn.esprit.pidev.Repositories.TagRepository;
 import tn.esprit.pidev.Services.QuestionServiceImpl;
 import tn.esprit.pidev.entities.Question;
+import tn.esprit.pidev.entities.Tag;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
 @AllArgsConstructor
 public class QuestionRestController {
     private QuestionServiceImpl questionService;
+
     @PostMapping("/addQuestion")
-    public Question addQuestion(Question question) {
+    public Question addQuestion(@RequestBody Question question) {
         return questionService.addQuestion(question);
     }
     @PostMapping("/images")
