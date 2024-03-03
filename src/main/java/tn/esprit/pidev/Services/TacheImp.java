@@ -18,7 +18,11 @@ import tn.esprit.pidev.entities.Journal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static tn.esprit.pidev.entities.RoleName.ETUDIANT;
+
 @AllArgsConstructor
 @Service
 @Slf4j
@@ -74,62 +78,94 @@ public class TacheImp implements ITacheService{
   }
 
     public void validateTask(String tacheId) {
-        Tache tache = tacheRepository.findById(tacheId)
-                .orElseThrow(() -> new RuntimeException("Tâche non trouvée"));
+        Optional<Tache> optionalTache = tacheRepository.findById(tacheId);
+        if (optionalTache.isPresent()) {
+            Tache tache = optionalTache.get();
+            Journal journalTache = tache.getJournal();
+            List<Stage> stages = stageRepository.findByJournal(journalTache);
 
-        // Trouver les stages associés à la tâche
-        List<Stage> stages = stageRepository.findByJournal_TachesContains(tache);
+            if (stages.isEmpty()) {
+                throw new RuntimeException("Aucun stage trouvé pour le journal associé à la tâche spécifiée");
+            }
 
-        if (stages.isEmpty()) {
-            throw new RuntimeException("Aucun stage trouvé pour la tâche spécifiée");
-        }
+            for (Stage stage : stages) {
+                Journal journalStage = stage.getJournal();
+                if (!journalTache.equals(journalStage)) {
+                    continue;
+                }
 
-        // Pour chaque stage trouvé, vous pouvez choisir d'exécuter une action spécifique
-        for (Stage stage : stages) {
-            // Mettre à jour l'état de la tâche pour la valider
-            tache.setValidated(true);
-            tacheRepository.save(tache);
+                // Vérifier le rôle de l'utilisateur associé au stage
+                User user = stage.getUser();
+                if (user != null && user.getEmailPro() != null)  {
+                    String studentEmail = user.getEmailPro();
+                    tache.setValidated(true);
+                    tacheRepository.save(tache);
 
-            // Construire le contenu du courriel
-            String subject = "Validation de tâche";
-            String message = "Bonjour " + stage.getUser().getFirstName() + ",\n\n" +
-                    "Nous sommes heureux de vous informer que votre tâche a été validée avec succès.\n\n" +
-                    "Cordialement,\n" +
-                    "L'équipe de validation de tâche";
+                    String subject = "Validation de tâche";
+                    // Ajout du libellé et de la date de la tâche dans le message
+                    String message = "Bonjour " + user.getFirstName() + ",\n\n" +
+                            "Nous sommes heureux de vous informer que votre tâche intitulée '" + tache.getLibelle() + "' créée le " + tache.getDate() + " a été validée avec succès.\n\n" +
+                            "Cordialement,\n" +
+                            "L'équipe de validation de tâche";
 
-            // Envoyer un e-mail à l'utilisateur pour informer de la validation de la tâche
-            emailService.sendEmail(stage.getUser().getLogin(), subject, message);
+                    try {
+                        emailService.sendEmail(studentEmail, subject, message);
+                    } catch (Exception e) {
+                        // Gérer les exceptions liées à l'envoi de l'e-mail
+                        throw new RuntimeException("Erreur lors de l'envoi de l'e-mail de validation de tâche", e);
+                    }
+                }
+            }
+        } else {
+            throw new RuntimeException("Tâche non trouvée");
         }
     }
+
     public void rejectTask(String tacheId, String rejectionReason) {
-        Tache tache = tacheRepository.findById(tacheId).orElseThrow(() -> new RuntimeException("Tâche non trouvée"));
-        List<Stage> stages = stageRepository.findByJournal_TachesContains(tache);
+        Optional<Tache> optionalTache = tacheRepository.findById(tacheId);
+        if (optionalTache.isPresent()) {
+            Tache tache = optionalTache.get();
+            Journal journalTache = tache.getJournal();
+            List<Stage> stages = stageRepository.findByJournal(journalTache);
 
-        if (stages == null || stages.isEmpty()) {
-            throw new RuntimeException("Stage non trouvé pour la tâche spécifiée");
-        }
+            if (stages.isEmpty()) {
+                throw new RuntimeException("Aucun stage trouvé pour le journal associé à la tâche spécifiée");
+            }
 
-        // Parcourir la liste des stages
-        for (Stage stage : stages) {
-            // Récupérer l'utilisateur à partir du stage
-            User user = stage.getUser();
+            for (Stage stage : stages) {
+                Journal journalStage = stage.getJournal();
+                if (!journalTache.equals(journalStage)) {
+                    continue;
+                }
 
-            // Mettre à jour l'état de la tâche pour la rejeter
-            tache.setValidated(false);
-            tacheRepository.save(tache);
+                // Vérifier le rôle de l'utilisateur associé au stage
+                User user = stage.getUser();
+                if (user != null && user.getEmailPro() != null)  {
+                    String userMail = user.getEmailPro();
+                    tache.setValidated(false); // Rejeter la tâche
+                    tacheRepository.save(tache);
 
-            // Construire le contenu du courriel
-            String subject = "Refus de validation de tâche";
-            String message = "Bonjour " + user.getFirstName() + ",\n\n" +
-                    "Nous regrettons de vous informer que votre tâche a été refusée pour la raison suivante :\n" +
-                    rejectionReason + "\n\n" +
-                    "Veuillez prendre les mesures nécessaires pour corriger les problèmes éventuels.\n\n" +
-                    "Cordialement,\n" +
-                    "L'équipe de validation de tâche";
+                    String subject = "Refus de validation de tâche";
+                    // Ajouter la raison du refus dans le message
+                    String message = "Bonjour " + user.getFirstName() + ",\n\n" +
+                            "Nous regrettons de vous informer que votre tâche intitulée '" + tache.getLibelle() + "' a été refusée pour la raison suivante :\n" +
+                            rejectionReason + "\n\n" +
+                            "Veuillez prendre les mesures nécessaires pour corriger les problèmes éventuels.\n\n" +
+                            "Cordialement,\n" +
+                            "L'équipe de validation de tâche";
 
-            // Envoyer un e-mail à l'utilisateur pour informer du rejet de la tâche avec la raison
-            emailService.sendEmail(user.getLogin(), subject, message);
+                    try {
+                        emailService.sendEmail(userMail, subject, message);
+                    } catch (Exception e) {
+                        // Gérer les exceptions liées à l'envoi de l'e-mail
+                        throw new RuntimeException("Erreur lors de l'envoi de l'e-mail de refus de tâche", e);
+                    }
+                }
+            }
+        } else {
+            throw new RuntimeException("Tâche non trouvée");
         }
     }
+
 }
 

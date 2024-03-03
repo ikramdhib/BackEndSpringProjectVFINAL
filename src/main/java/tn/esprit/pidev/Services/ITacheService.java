@@ -11,6 +11,6 @@ public interface ITacheService {
 
     public List<Tache> getTachesByJournalId(String journalId);
     public void rejectTask(String taskId, String rejectionReason);
-    public void validateTask(String taskId) ;
+    public void validateTask(String tacheId) ;
 
     }

@@ -1,6 +1,7 @@
 package tn.esprit.pidev.Repositories;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import tn.esprit.pidev.entities.Journal;
 import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.Tache;
 import tn.esprit.pidev.entities.User;
@@ -17,5 +18,6 @@ public interface StageRepository extends MongoRepository<Stage,String> {
     Optional<Stage> findById(String id);
     List<Stage> findByEncadrantId(String encadrantId);
     List<Stage> findByJournal_TachesContains(Tache tache);
+    List<Stage> findByJournal(Journal journal);
 
 }

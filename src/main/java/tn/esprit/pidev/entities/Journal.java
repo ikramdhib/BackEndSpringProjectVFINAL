@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
@@ -28,5 +29,11 @@ public class Journal {
     }
     public List<Tache> getTaches() {
         return taches;
+    }
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Journal journal = (Journal) obj;
+        return Objects.equals(id, journal.id);
     }
 }

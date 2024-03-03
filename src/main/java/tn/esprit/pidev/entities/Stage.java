@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.Objects;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -73,5 +75,12 @@ public class Stage {
 
     public void setDateValidationCon(LocalDate ValidationCon) {
         this.ValidationCon = ValidationCon;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Stage stage = (Stage) obj;
+        return Objects.equals(id, stage.id);
     }
 }

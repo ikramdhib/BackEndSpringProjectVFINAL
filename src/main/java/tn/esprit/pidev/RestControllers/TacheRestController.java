@@ -36,7 +36,7 @@ public class TacheRestController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping("/taches/{tacheId}/valider")
+    @PostMapping("/taches/{tacheId}/valider")
     public ResponseEntity<String> validateTask(@PathVariable String tacheId) {
         try {
             iTacheService.validateTask(tacheId);
@@ -46,7 +46,8 @@ public class TacheRestController {
         }
     }
 
-    @PutMapping("/taches/{tacheId}/rejeter/{rejectionReason}")
+
+    @PostMapping("/taches/{tacheId}/rejeter/{rejectionReason}")
     public ResponseEntity<String> rejectTask(@PathVariable String tacheId, @PathVariable String rejectionReason) {
         try {
             iTacheService.rejectTask(tacheId, rejectionReason);
