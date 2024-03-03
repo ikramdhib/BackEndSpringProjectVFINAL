@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,21 +34,28 @@ public class QuestionServiceImpl implements IServiceQuestion {
     public Question addQuestion(Question question) {
         User user = userRepository.findById("65d5faf88ecbf72fd4d359f2").orElse(null);
         question.setUser(user);
+
         if (question.getTags() != null) {
-            List<Tag> processedTags = question.getTags().stream()
-                    .map(tag -> tagRepository.findByName(tag.getName())
-                            .map(existingTag -> {
-                                existingTag.setUsageCount(existingTag.getUsageCount() + 1);
-                                return existingTag;
-                            })
-                            .orElseGet(() -> {
-                                tag.setUsageCount(1);
-                                return tagRepository.save(tag);
-                            }))
-                    .collect(Collectors.toList());
-            question.setTags(processedTags);
+            List<Tag> processedTags = new ArrayList<>(); // Créez une liste pour stocker les tags traités
+
+            for (Tag tag : question.getTags()) { // Bouclez sur les tags existants de la question
+                Tag existingTag = tagRepository.findByName(tag.getName()); // Recherchez le tag par son nom
+
+                if (existingTag != null) { // Si le tag existe déjà
+                    existingTag.setUsageCount(existingTag.getUsageCount() + 1); // Incrémentez le compteur d'utilisation
+                    tagRepository.save(existingTag); // Enregistrez le tag existant mis à jour
+                    processedTags.add(existingTag); // Ajoutez le tag existant à la liste des tags traités
+                } else { // Si le tag n'existe pas
+                    tag.setUsageCount(1); // Initialisez le compteur d'utilisation
+                    Tag savedTag = tagRepository.save(tag); // Enregistrez le nouveau tag
+                    processedTags.add(savedTag); // Ajoutez le nouveau tag à la liste des tags traités
+                }
+            }
+
+            question.setTags(processedTags); // Mettez à jour les tags de la question avec la liste traitée
         }
-        return questionRepository.save(question);
+
+        return questionRepository.save(question); // Enregistrez la question dans le repository
     }
 
 
