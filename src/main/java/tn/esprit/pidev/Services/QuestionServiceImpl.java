@@ -37,10 +37,8 @@ public class QuestionServiceImpl implements IServiceQuestion {
 
         if (question.getTags() != null) {
             List<Tag> processedTags = new ArrayList<>(); // Créez une liste pour stocker les tags traités
-
             for (Tag tag : question.getTags()) { // Bouclez sur les tags existants de la question
                 Tag existingTag = tagRepository.findByName(tag.getName()); // Recherchez le tag par son nom
-
                 if (existingTag != null) { // Si le tag existe déjà
                     existingTag.setUsageCount(existingTag.getUsageCount() + 1); // Incrémentez le compteur d'utilisation
                     tagRepository.save(existingTag); // Enregistrez le tag existant mis à jour
@@ -51,10 +49,8 @@ public class QuestionServiceImpl implements IServiceQuestion {
                     processedTags.add(savedTag); // Ajoutez le nouveau tag à la liste des tags traités
                 }
             }
-
             question.setTags(processedTags); // Mettez à jour les tags de la question avec la liste traitée
         }
-
         return questionRepository.save(question); // Enregistrez la question dans le repository
     }
 

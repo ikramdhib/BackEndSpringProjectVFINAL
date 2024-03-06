@@ -33,8 +33,8 @@ public class ReponseRestController {
         commentaireService.deleteReponse(id);
     }
     @GetMapping("/findMostAnsweredQuestionByUser/{userId}")
-    public List<Question> findMostAnsweredQuestionByUser(@PathVariable String userId) {
-        return commentaireService.findMostAnsweredQuestionByUser(userId);
+    public List<Question> findMostAnsweredQuestionsByUser(@PathVariable String userId) {
+        return commentaireService.findMostAnsweredQuestionsByUser(userId);
     }
     @GetMapping("/nombreReponseByQuestion/{questionId}")
     public int nombreReponseByQuestion(@PathVariable String questionId) {

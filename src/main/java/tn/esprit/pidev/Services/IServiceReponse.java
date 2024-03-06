@@ -11,6 +11,6 @@ public interface IServiceReponse {
     public List<Reponse> getAllReponses();
     public List<Reponse> getResponsesForQuestion(String questionId);
     public void deleteReponse(String id);
-    public List<Question> findMostAnsweredQuestionByUser(String userId);
+    public List<Question> findMostAnsweredQuestionsByUser(String userId);
     public int nombreReponseByQuestion(String questionId);
 }
