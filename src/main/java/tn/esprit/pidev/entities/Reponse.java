@@ -8,8 +8,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Document(collection = "forums")
-public class Forum {
-    public int id;
+@Document(collection = "commentaires")
+public class Reponse {
+    public String id;
     public String content;
+    public String questionId;
+    public User user;
 }

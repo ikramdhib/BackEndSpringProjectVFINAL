@@ -66,6 +66,7 @@ public class JwtService {
         log.info(new Date(System.currentTimeMillis())+"aaaaaaaaaaaaaaaaaaa");
         log.info(new Date(System.currentTimeMillis()+expiration)+"bbbbbbbbbbbbbbbbbbbbbbbbbbbb");
         extraClaims.put("role",userDetails.getAuthorities());
+        log.info(extraClaims.get("role")+"---------------------------------------------***");
         return Jwts
         .builder()
                 .setClaims(extraClaims)
@@ -98,7 +99,6 @@ public class JwtService {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-
     }
 
     private Key getSignInKey() {
