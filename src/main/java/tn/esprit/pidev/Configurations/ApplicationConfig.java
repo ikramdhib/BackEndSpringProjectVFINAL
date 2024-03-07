@@ -21,13 +21,13 @@ public class ApplicationConfig {
     private final UserRepository userRepository;
 
     @Bean
-    public UserDetailsService userDetailsService (){
+    public UserDetailsService userDetailsService (){ //get user information
         return username -> userRepository.findByLogin(username)
                 .orElseThrow(() ->new UsernameNotFoundException("user not found"));
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider(){ //authentf users in application
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
@@ -35,6 +35,7 @@ public class ApplicationConfig {
     }
 
     @Bean
+    //gere le procesus d'authentification
     public AuthenticationManager  authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }

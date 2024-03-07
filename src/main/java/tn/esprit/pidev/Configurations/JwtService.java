@@ -101,7 +101,7 @@ public class JwtService {
 
     }
 
-    private Key getSignInKey() {
+    private Key getSignInKey() { // create secret key for token as sign
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
