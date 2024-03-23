@@ -22,6 +22,7 @@ public interface IServiceUser {
     User addSupervisor(User user);
 
     Boolean blockUser(String id);
+    Boolean deBlockUser(String id);
 
     List<User> getAllUserWithRole(RoleName roleName);
 
@@ -35,6 +36,11 @@ public interface IServiceUser {
 
     User getUserById(String id);
 
-
     User updatePassword(String id , String newPass) ;
+
+    User deleteUser(String id);
+
+    User addServiceStage(User user);
+
+    User updateServiceStage(String id , User user);
 }

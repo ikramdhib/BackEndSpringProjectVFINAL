@@ -50,6 +50,43 @@ public class UserServiceImpl implements IServiceUser {
         return userRepository.save(user);
     }
 
+    @Override
+    public User deleteUser(String id) {
+        User user = userRepository.findById(id).orElse(null);
+        if(user!=null){
+            userRepository.deleteById(id);
+        }
+     return user;
+    }
+
+    @Override
+    public User addServiceStage(User user) {
+        user.setRole(RoleName.SERVICE_STAGE);
+        user.setActivated(true);
+        user.setPassword(passwordEncoder.encode(user.password));
+        log.info(user+"999999999999999999999");
+        User user1 = userRepository.save(user);
+        return user1;
+    }
+
+    @Override
+    public User updateServiceStage(String id, User user) {
+        User user1 = userRepository.findById(id).orElse(null);
+        log.info("true8888888888888888888888888888");
+        if(user1!=null){
+            if(user.pic!=null){
+                user1.setPic(user1.pic);
+            }
+            user1.setAddress(user.address);
+            user1.setCin(user.cin);
+            user1.setPhoneNumber(user.phoneNumber);
+            user1.setLastName(user.lastName);
+            user1.setFirstName(user.firstName);
+            user1.setLogin(user.login);
+        }
+        return userRepository.save(user1);
+    }
+
 
     public String confirmUpdatePass(String id, String newPass , String oldPass) throws MessagingException, UnsupportedEncodingException {
 
@@ -165,6 +202,18 @@ public class UserServiceImpl implements IServiceUser {
     }
 
     @Override
+    public Boolean deBlockUser(String id) {
+        User user = userRepository.findById(id).orElse(null);
+
+        if(!user.isActivated()){
+            user.setActivated(true);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public List<User> getAllUserWithRole(RoleName roleName) {
 
         return userRepository.findByRole(roleName);
@@ -190,28 +239,49 @@ public class UserServiceImpl implements IServiceUser {
         if(user1.role.equals(RoleName.ENCADRANT)){
             if(user.pic!=null){
                 try {
+                    user1.setPic(user.pic);
                     cloudinaryService.delete(user.pic);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
+            if(user.company!=null){
+                user1.setCompany(user.company);
+            }
+            if(user.login!=null){
+                user1.setLogin(user.login);
+            }
             user1.setAddress(user.address);
             user1.setPhoneNumber(user.phoneNumber);
-            user1.setPic(user.pic);
             user1.setEmailPro(user.emailPro);
             user1.setCin(user.cin);
         }else{
             if(user.pic!=null){
                 try {
+                    user1.setPic(user.pic);
                     cloudinaryService.delete(user.pic);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
+            if(user.firstName!=null){
+                user1.setFirstName(user.firstName);
+            }
+            if(user.lastName!=null){
+                user1.setLastName(user.lastName);
+            }
+            if(user.level!=null){
+                user1.setLevel(user.level);
+            }
+            if(user.unvId!=null){
+                user1.setUnvId(user.unvId);
+            }
+            if(user.login!=null){
+                user1.setLogin(user.login);
+            }
             user1.setAddress(user.address);
             user1.setPhoneNumber(user.phoneNumber);
             user1.setCin(user.cin);
-            user1.setPic(user.pic);
         }
         log.info(user1.pic);
         return userRepository.save(user1);
