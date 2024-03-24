@@ -3,17 +3,22 @@ package tn.esprit.pidev.Services.UserServices;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Configurations.JwtService;
 import tn.esprit.pidev.Repositories.UserRepository;
+import tn.esprit.pidev.Services.UserServices.Pagination.PagedResponse;
+import tn.esprit.pidev.Services.UserServices.Pagination.SearchRequest;
+import tn.esprit.pidev.Services.UserServices.Pagination.Util.SearchRequestUtil;
 import tn.esprit.pidev.Services.UserServices.UserListnner.MailingForgetPassListner;
 import tn.esprit.pidev.entities.User;
 
 import tn.esprit.pidev.entities.RoleName;
 
+import java.awt.print.Pageable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -21,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -214,9 +220,14 @@ public class UserServiceImpl implements IServiceUser {
     }
 
     @Override
-    public List<User> getAllUserWithRole(RoleName roleName) {
+    public PagedResponse<User> getAllUserWithRole(RoleName roleName , final SearchRequest request) {
+        final Page<User> response = userRepository.findByRole(roleName,SearchRequestUtil.toPageRequest(request));
+        if (response.isEmpty()) {
+            return new PagedResponse<>(Collections.emptyList(), 0, response.getTotalElements());
+        }
 
-        return userRepository.findByRole(roleName);
+        final List<User> dtos = response.getContent();
+        return new PagedResponse<>(dtos, dtos.size(), response.getTotalElements());
     }
     @Override
     public boolean createPasswordResetToken(String token , UserDetails userDetails){

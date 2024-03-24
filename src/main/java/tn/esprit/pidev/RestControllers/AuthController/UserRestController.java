@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.RestControllers.AuthController.Param.ResponseModel;
 import tn.esprit.pidev.Services.UserServices.CloudinaryService;
+import tn.esprit.pidev.Services.UserServices.Pagination.PagedResponse;
+import tn.esprit.pidev.Services.UserServices.Pagination.SearchRequest;
+import tn.esprit.pidev.Services.UserServices.Pagination.Util.SearchRequestUtil;
 import tn.esprit.pidev.Services.UserServices.PasswordReset;
 import tn.esprit.pidev.Services.UserServices.UserServiceImpl;
 import tn.esprit.pidev.entities.Level;
@@ -146,14 +149,9 @@ public class UserRestController {
     }
 
     @GetMapping("/users/{roleName}")
-    public ResponseEntity<?> getAllUsersWithRole(@PathVariable RoleName roleName){
-        List<User> users = userService.getAllUserWithRole(roleName);
-        if(!users.isEmpty()){
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(users);
-        }
-        responseModel.setResponse("NO AVAILABLE USERS");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+    public PagedResponse<User> getAllUsersWithRole(@PathVariable RoleName roleName , SearchRequest requestUtil){
+
+        return  userService.getAllUserWithRole(roleName , requestUtil);
     }
 
     @PutMapping("/updateUser/{id}") //a modifier
