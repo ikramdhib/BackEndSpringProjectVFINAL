@@ -18,6 +18,8 @@ import java.util.Date;
 @AllArgsConstructor
 public class HistoriqueAspect {
     private HistoriqueServiceImpl historiqueService;
+    //points d'intérêt de jointure et nous permettent ainsi de contrôler le moment où les conseils sont exécutés.
+    //@Pointcut permet de définir des points de coupe.
     @Pointcut("execution(* tn.esprit.pidev.Services.QuestionServiceImpl.addQuestion(..))" +
             "|| execution(* tn.esprit.pidev.Services.ReponseServiceImpl.deleteReponse(..))" +
             "|| execution(* tn.esprit.pidev.Services.ReponseServiceImpl.addReponse(..))")

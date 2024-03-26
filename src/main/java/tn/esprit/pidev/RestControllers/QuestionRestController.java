@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Repositories.TagRepository;
 import tn.esprit.pidev.Services.QuestionServiceImpl;
 import tn.esprit.pidev.entities.Question;
+import tn.esprit.pidev.entities.QuestionResponse;
 import tn.esprit.pidev.entities.Tag;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class QuestionRestController {
     private QuestionServiceImpl questionService;
 
     @PostMapping("/addQuestion")
-    public Question addQuestion(@RequestBody Question question) {
+    public QuestionResponse addQuestion(@RequestBody Question question) {
         return questionService.addQuestion(question);
     }
     @PostMapping("/images")
