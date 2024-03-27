@@ -9,10 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.Configurations.JwtService;
 import tn.esprit.pidev.Configurations.SecurityPrincipale;
 import tn.esprit.pidev.RestControllers.AuthController.Param.*;
+import tn.esprit.pidev.Services.ReclamationService.WebSocketServices.NotificationService;
 import tn.esprit.pidev.Services.UserServices.AuthenticationService;
 import tn.esprit.pidev.Services.UserServices.UserListnner.MailingForgetPassListner;
 import tn.esprit.pidev.Services.UserServices.UserServiceImpl;
@@ -37,13 +40,6 @@ public class AuthenticationRestController {
     public MailingForgetPassListner mailingForgetPassListner;
     private JwtService jwtService;
     public ServletContext context;
-
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticateResponse> register(
-            @RequestBody RegesterRequest request){
-        log.info("regitred");
-        return ResponseEntity.ok(authenticationService.register(request));
-    }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticateResponse> authenticate(
