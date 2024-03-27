@@ -1,12 +1,14 @@
 package tn.esprit.pidev.RestControllers;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Repositories.TagRepository;
 import tn.esprit.pidev.Services.QuestionServiceImpl;
+import tn.esprit.pidev.Services.TextRazorService;
 import tn.esprit.pidev.entities.Question;
 import tn.esprit.pidev.entities.QuestionResponse;
 import tn.esprit.pidev.entities.Tag;
@@ -19,13 +21,19 @@ import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
+@Slf4j
 @AllArgsConstructor
 public class QuestionRestController {
     private QuestionServiceImpl questionService;
+    private TextRazorService textRazorService;
 
     @PostMapping("/addQuestion")
-    public QuestionResponse addQuestion(@RequestBody Question question) {
-        return questionService.addQuestion(question);
+    public ResponseEntity<QuestionResponse> addQuestion(@RequestBody Question question) {
+
+        // Si le contenu est validé, procédez à l'ajout de la question et retournez la réponse
+        QuestionResponse response = questionService.addQuestion(question);
+        // Retournez la réponse dans une ResponseEntity avec le statut HTTP OK
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/images")
      public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile imageFile) {

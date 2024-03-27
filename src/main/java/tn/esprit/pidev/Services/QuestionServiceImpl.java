@@ -34,6 +34,7 @@ public class QuestionServiceImpl implements IServiceQuestion {
     private QuestionRepository questionRepository;
     private UserRepository userRepository;
     private TagRepository tagRepository;
+    private TextRazorService textRazorService;
     private final Path rootLocation = Paths.get("images/");
     private final String apiKey = "AIzaSyB8Mc8MXummb2ZNnkjWEaRnYYoBb8zRrME";
     private final String apiUrl = "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=" + apiKey;
@@ -43,19 +44,23 @@ public class QuestionServiceImpl implements IServiceQuestion {
     public QuestionResponse addQuestion(Question question) {
         String originalContent = question.getContent();
         double toxicityScore = getToxicityScore(originalContent); // Vous devez implémenter cette méthode
+        boolean isContentValid = textRazorService.validateContentForProgramming(question.getContent());
 
-        if (toxicityScore > 0.1) {
+        if (!isContentValid) {
+            // Retourner une réponse indiquant que le contenu n'est pas lié à la programmation
+            return new QuestionResponse(true, "Le contenu de la question n'est pas lié à la programmation informatique.", null);
+        }else if (toxicityScore > 0.1) {
             // Ne pas enregistrer la question et renvoyer une réponse indiquant la présence de contenu toxique
             return new QuestionResponse(true, "Votre contenu contient des mots toxiques", null);
-        } else {
-            // Enregistrez la question car le contenu n'est pas considéré comme toxique
-            User user = userRepository.findById("65d5faf88ecbf72fd4d359f2").orElse(null);
+        }
+
+        User user = userRepository.findById("65d5faf88ecbf72fd4d359f2").orElse(null);
             question.setUser(user);
             processTags(question);
             Question savedQuestion = questionRepository.save(question);
             return new QuestionResponse(false, "Question ajoutée avec succès", savedQuestion);
         }
-    }
+
 
     private void processTags(Question question) {
         if (question.getTags() != null) {
