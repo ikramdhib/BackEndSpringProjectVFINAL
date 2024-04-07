@@ -11,7 +11,10 @@ import tn.esprit.pidev.entities.User;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public interface IServiceUser {
 
@@ -33,8 +36,20 @@ public interface IServiceUser {
 
     User updateUser(String id , User user);
 
-    User getUserById(String id);
+    User getUserByIdv(String id);
 
 
     User updatePassword(String id , String newPass) ;
+
+
+    public List<User> getStudentsBySupervisor(String encadrantId);
+    public User findUserById(String userId) ;
+    public Optional<User> getUserById(String userId) ;
+    public Date getStageStartDate(String userId, String stageId) ;
+
+    public List<Map<String, String>> getStudentsByAllStages(String serviceId) ;
+    public List<User> getEtudiantsAvecStages() ;
+
+    public List<User> getEtudiants() ;
+    public List<String> getStudentsNamesByStageService() ;
 }

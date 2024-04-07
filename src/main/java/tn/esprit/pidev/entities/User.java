@@ -5,6 +5,11 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.Email;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +17,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
+
 import java.util.List;
 
 @AllArgsConstructor
@@ -46,10 +53,11 @@ public class User  implements UserDetails {
     public String emailPro;
     public String company;
     @Size(max = 8)
-    public String cin ;
+    public String cin;
     public String address;
-    public boolean activated = false ;
-    public RoleName role ;
+    public boolean activated = false;
+    public RoleName role;
+    public boolean validated;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -80,4 +88,34 @@ public class User  implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+        //@DBRef
+        // private Role role;
+        @DBRef
+        private List<Stage> stage;
+        private String stageId;
+
+        public String getStageId () {
+            return stageId;
+        }
+
+        public void setStageId (String stageId){
+            this.stageId = stageId;
+        }
+
+    public User(String id, String firstName, String lastName) {
+            this.id = id;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.company = company;
+        }
+
+        public void setStages (List < Stage > stages) {
+            this.stage = stages;
+        }
+        public List<Stage> getStages () {
+            return stage;
+        }
+
 }
+

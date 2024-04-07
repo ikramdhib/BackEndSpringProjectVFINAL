@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.RestControllers.AuthController.Param.ResponseModel;
 import tn.esprit.pidev.Services.UserServices.CloudinaryService;
 import tn.esprit.pidev.Services.UserServices.PasswordReset;
@@ -19,8 +20,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -30,6 +33,7 @@ import java.util.Map;
 public class UserRestController {
 
     public UserServiceImpl userService;
+    public UserRepository userRepository ;
 
     private final  ResponseModel responseModel = new ResponseModel();
 
@@ -185,7 +189,7 @@ public class UserRestController {
     @GetMapping("/getUser/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id){
 
-        User user = userService.getUserById(id);
+        User user = userService.getUserByIdv(id);
         if(user == null){
             responseModel.setResponse("USER NOT FOUND");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
@@ -223,6 +227,65 @@ public class UserRestController {
         responseModel.setResponse("TRY AGAIN");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
     }
+
+
+    @GetMapping("/students/{encadrantId}")
+    public List<User> getStudentsBySupervisor(@PathVariable String encadrantId) {
+        return userService.getStudentsBySupervisor(encadrantId);
+    }
+    @GetMapping("/{userId}/stages/{stageId}/startdate")
+    public ResponseEntity<Date> getStageStartDate(@PathVariable String userId, @PathVariable String stageId) {
+        Date startDate = userService.getStageStartDate(userId, stageId);
+        if (startDate != null) {
+            return ResponseEntity.ok(startDate);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+
+
+    @PutMapping("/{id}/validate")
+    public ResponseEntity<String> validateStudent(@PathVariable String id) {
+        User student = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Student not found"));
+
+        if (!student.isValidated()) {
+            student.setValidated(true);
+            userRepository.save(student);
+            return ResponseEntity.ok("Student validated successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Student is already validated.");
+        }
+    }
+    @PostMapping("/{studentId}/reject/{rejectionReason}")
+    public ResponseEntity<?> rejectStudent(@PathVariable String studentId, @PathVariable String rejectionReason) {
+        try {
+            userService.rejectStudent(studentId, rejectionReason);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur est survenue lors du rejet de l'étudiant.");
+        }
+    }
+
+
+    @GetMapping("/stages/students/{serviceId}")
+    public List<Map<String, String>> getStudentsByAllStages(@PathVariable String serviceId) {
+        List<Map<String, String>> allStudents = userService.getStudentsByAllStages(serviceId);
+
+        // Filtrer les étudiants non validés
+        List<Map<String, String>> nonValidatedStudents = allStudents.stream()
+                .filter(student -> !Boolean.parseBoolean(student.get("validated")))
+                .collect(Collectors.toList());
+
+        return nonValidatedStudents;
+    }
+    @GetMapping("/students/byStageService")
+    public List<String> getStudentsNamesByStageService() {
+        return userService.getStudentsNamesByStageService();
+    }
+
+
 
 
 

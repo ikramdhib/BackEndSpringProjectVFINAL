@@ -8,9 +8,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Configurations.JwtService;
+import tn.esprit.pidev.Repositories.StageRepository;
 import tn.esprit.pidev.Repositories.UserRepository;
+import tn.esprit.pidev.Services.EmailService;
 import tn.esprit.pidev.Services.UserServices.UserListnner.MailingForgetPassListner;
+import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
+import jakarta.ws.rs.NotFoundException;
 
 import tn.esprit.pidev.entities.RoleName;
 
@@ -21,9 +25,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -35,8 +38,12 @@ public class UserServiceImpl implements IServiceUser {
     private  MailingForgetPassListner mailingForgetPassListner;
     private  UserRepository userRepository;
     private  PasswordEncoder passwordEncoder;
+    private StageRepository stageRepository;
+
+    private EmailService emailService;
+
     @Override
-    public User getUserById(String id) {
+    public User getUserByIdv(String id) {
         return userRepository.findById(id).orElse(null);
     }
 
@@ -215,6 +222,125 @@ public class UserServiceImpl implements IServiceUser {
         }
         log.info(user1.pic);
         return userRepository.save(user1);
+    }
+
+
+    public List<User> getStudentsBySupervisor(String encadrantId) {
+        User encadrant = userRepository.findById(encadrantId)
+                .orElseThrow(() -> new IllegalArgumentException("Encadrant with ID " + encadrantId + " not found"));
+
+        List<Stage> stages = stageRepository.findByEncadrant(encadrant);
+        List<User> students = stages.stream()
+                .map(stage -> {
+                    User student = stage.getUser();
+                    User studentDTO = new User();
+                    studentDTO.setId(student.getId());
+                    studentDTO.setRole(RoleName.ETUDIANT);
+                    studentDTO.setFirstName(student.getFirstName());
+                    studentDTO.setLastName(student.getLastName());
+                    studentDTO.setLogin(student.getLogin()); // Ajout du login de l'étudiant
+                    studentDTO.setPhoneNumber(student.getPhoneNumber()); // Ajout du numéro de téléphone de l'étudiant
+                    studentDTO.setStageId(stage.getId());
+                    return studentDTO;
+                })
+                .collect(Collectors.toList());
+        return students;
+    }
+    public Optional<User> getUserById(String userId) {
+        return userRepository.findById(userId);
+    }
+
+    public User findUserById(String userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+    public Date getStageStartDate(String userId, String stageId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (user.getStages() != null) {
+                for (Stage stage : user.getStages()) {
+                    if (stage.getId().equals(stageId)) {
+                        return stage.getStartAt();
+                    }
+                }
+            }
+        }
+        return null; // Stage non trouvé
+    }
+
+
+    public void rejectStudent(String studentId, String rejectionReason) {
+        User student = userRepository.findById(studentId).orElseThrow(() -> new NotFoundException("Étudiant non trouvé avec l'ID : " + studentId));
+
+        // Mettre à jour le statut de l'étudiant
+        student.setValidated(true);
+        userRepository.save(student);
+
+        // Envoyer un e-mail de rejet à l'étudiant
+        if (student.getLogin() != null) {
+            String subject = "Rejet de votre demande";
+            String text = "Bonjour " + student.getFirstName() + ",\n\n" +
+                    "Nous regrettons de vous informer que votre demande a été rejetée pour la raison suivante : " + rejectionReason + ".\n" +
+                    "Veuillez prendre les mesures nécessaires pour corriger les problèmes éventuels.\n\n" +
+                    "Cordialement,\n" +
+                    "Votre équipe.";
+            emailService.sendEmail(student.getLogin(), subject, text);
+
+            // Mettre à jour le statut de validation de l'étudiant après l'envoi de l'e-mail
+            student.setValidated(true);
+            userRepository.save(student);
+        } else {
+            // Gérer le cas où l'e-mail de l'utilisateur est null
+            // Vous pouvez par exemple enregistrer un journal d'erreur ou envoyer une notification à l'administrateur
+            // pour signaler que l'e-mail de l'utilisateur est manquant.
+        }
+    }
+
+
+
+    public List<User> getEtudiants() {
+        return userRepository.findAll(); // Ou tout autre méthode pour récupérer les étudiants de votre base de données
+    }
+    public List<Map<String, String>> getStudentsByAllStages(String serviceId) {
+        List<Stage> stages = stageRepository.findAll(); // Supposons que vous ayez un repository pour les stages
+
+        // Implémentez la logique pour récupérer les étudiants associés à tous les stages
+        // et les retourner sous forme de liste de Map comme expliqué précédemment
+
+        // Exemple simplifié (à adapter à votre logique réelle)
+        return stages.stream()
+                .filter(stage -> stage.getUser() != null) // Filtrer les stages avec un utilisateur non null
+                .map(stage -> {
+                    Map<String, String> studentMap = new HashMap<>();
+                    User user = stage.getUser();
+                    studentMap.put("id", user.getId() != null ? user.getId() : ""); // Ajoutez l'ID de l'étudiant
+                    studentMap.put("firstName", user.getFirstName() != null ? user.getFirstName() : "");
+                    studentMap.put("lastName", user.getLastName() != null ? user.getLastName() : "");
+                    // Ajoutez l'information de validation (supposons que vous ayez un moyen de la récupérer)
+                    studentMap.put("validated", user.isValidated() ? "true" : "false");
+                    return studentMap;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> getEtudiantsAvecStages() {
+        return null;
+    }
+    public List<String> getStudentsNamesByStageService() {
+        // Récupérer tous les stages avec des utilisateurs associés
+        List<Stage> stagesWithUsers = stageRepository.findStagesWithUsers();
+
+        // Extraire les noms et prénoms des étudiants de ces stages
+        return stagesWithUsers.stream()
+                .filter(stage -> stage.getUser() != null) // Filtrer les stages avec un utilisateur non null
+                .map(stage -> {
+                    String firstName = stage.getUser().getFirstName();
+                    String lastName = stage.getUser().getLastName();
+                    return (firstName != null && lastName != null) ? firstName + " " + lastName : "";
+                })
+                .filter(name -> !name.isEmpty()) // Filtrer les noms non vides
+                .collect(Collectors.toList());
     }
 
 }
