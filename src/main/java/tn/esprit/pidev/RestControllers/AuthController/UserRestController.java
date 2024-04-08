@@ -186,6 +186,8 @@ public class UserRestController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
     }
 
+
+
     @GetMapping("/getUser/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id){
 
@@ -243,9 +245,6 @@ public class UserRestController {
         }
     }
 
-
-
-
     @PutMapping("/{id}/validate")
     public ResponseEntity<String> validateStudent(@PathVariable String id) {
         User student = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Student not found"));
@@ -286,6 +285,17 @@ public class UserRestController {
     }
 
 
+    @GetMapping("afficherUtilisateur/{userId}")
+    public ResponseEntity<User> getUserById2(@PathVariable String userId) {
+        User user = userService.getUserById2(userId);
+        return ResponseEntity.ok(user);
+    }
+
+
+    @GetMapping("/studentsNotes/{encadrantId}")
+    public List<User> getStudentsBySupervisorNote(@PathVariable String encadrantId) {
+        return userService.getStudentsBySupervisorNote(encadrantId);
+    }
 
 
 

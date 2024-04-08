@@ -1,6 +1,5 @@
 package tn.esprit.pidev.Services;
 
-import lombok.AllArgsConstructor;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
@@ -10,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import tn.esprit.pidev.Repositories.StageRepository;
 import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.entities.Stage;
@@ -27,8 +28,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.tika.metadata.Metadata;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
-@AllArgsConstructor
+@Slf4j
 public class StageServiceImpl implements IServiceStage{
     private UserRepository userRepository;
     private StageRepository stageRepository;
@@ -248,6 +252,35 @@ public class StageServiceImpl implements IServiceStage{
 
         return timeline;
     }
+
+    @Autowired
+    public StageServiceImpl(StageRepository stageRepository, UserRepository userRepository) {
+        this.stageRepository = stageRepository;
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public void ajouterEtAffecterStageAUtilisateur(Stage stage, String userId) {
+
+        User user = userRepository.findById(userId).orElse(null);
+        stage.setUser(user);
+        stageRepository.save(stage);
+        log.info(stage.type.name()+"&&&&&&&&&&&&&&&&&&&");
+
+    }
+
+    @Override
+    public void saveDemandeStage(String userId, String demandeStageContent) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID : " + userId));
+
+        Stage stage = new Stage();
+        stage.setUser(user);
+        stage.setDemandeS(demandeStageContent);
+
+        stageRepository.save(stage);
+    }
+
     @Override
     public List<Stage> getStagesByUserId(String userId) {
         return stageRepository.findByUserId(userId);
@@ -355,6 +388,78 @@ public class StageServiceImpl implements IServiceStage{
         boolean nombrePagesConforme = nombreRetoursLigne / 50 >= 20; // Supposer que 50 retours à la ligne représentent une page
 
         return titreConforme && paragrapheConforme && nombrePagesConforme;
+    }
+    @Override
+    public Stage updateStage(String stageId, Stage updatedStage) {
+
+            Stage existingStage = stageRepository.findById(stageId).orElse(null);
+
+            if (existingStage != null) {
+                // Mettez à jour les champs nécessaires du stage existant avec les nouvelles valeurs
+                existingStage.setNomSociete(updatedStage.getNomSociete());
+                existingStage.setNumSociete(updatedStage.getNumSociete());
+                existingStage.setEmailSociete(updatedStage.getEmailSociete());
+                existingStage.setNomCoach(updatedStage.getNomCoach());
+                existingStage.setPrenomCoach(updatedStage.getPrenomCoach());
+                existingStage.setNumCoach(updatedStage.getNumCoach());
+                existingStage.setEmailCoach(updatedStage.getEmailCoach());
+                existingStage.setStartAt(updatedStage.getStartAt());
+                existingStage.setEndAt(updatedStage.getEndAt());
+                existingStage.setType(updatedStage.getType());
+                // Enregistrez les modifications dans la base de données
+                return stageRepository.save(existingStage);
+            }
+
+            return null; // Ou lancez une exception selon vos besoins
+        }
+
+    @Override
+    public void deleteStageById(String stageId) {
+        stageRepository.deleteById(stageId);
+    }
+
+    @Override
+    public Stage getStageById(String stageId) {
+        return stageRepository.findById(stageId).orElse(null);
+    }
+
+    @Override
+    public boolean isJournalAssociated(String stageId) {
+        Stage stage = stageRepository.findById(stageId).orElse(null);
+        boolean isAssociated = (stage != null && stage.getJournal() != null);
+
+        // Ajouter des logs de débogage
+        System.out.println("Stage ID: " + stageId);
+        System.out.println("Is Journal Associated: " + isAssociated);
+
+        return isAssociated;
+    }
+
+    @Override
+    public Stage updateStage2(String stageId, Stage updatedStage) {
+        Stage existingStage = stageRepository.findById(stageId).orElse(null);
+        if (existingStage != null) {
+            // Mettre à jour les champs du stage avec les valeurs du stage mis à jour
+            existingStage.setRapportPdf(updatedStage.getRapportPdf());
+            // Vous pouvez mettre à jour d'autres champs ici si nécessaire
+            // Enregistrer le stage mis à jour dans la base de données
+            return stageRepository.save(existingStage);
+        }
+        return null; // ou lancez une exception appropriée si le stage n'est pas trouvé
+    }
+
+
+
+
+    @Override
+    public boolean rapportExistePourStage(String stageId) {
+        Stage stage = stageRepository.findById(stageId).orElse(null);
+        return stage != null && stage.getRapportPdf() != null;
+    }
+
+    @Override
+    public Stage findById(String id) {
+        return stageRepository.findById(id).orElse(null);
     }
 
 }

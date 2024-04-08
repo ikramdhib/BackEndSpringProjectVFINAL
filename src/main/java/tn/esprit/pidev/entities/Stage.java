@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
-import org.springframework.cglib.core.Local;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,25 +12,38 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
-@AllArgsConstructor
+
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Document(collection = "stages")
 public class Stage {
+    @Id
+
     public String id;
 
 
     public String certificate;
     public String report;
-    public Date startAt;
-    public Date endAt;
-    public LocalDate ValidationCon;
-    public Type type;
+
+    public String attestation;
+    public String rapport;
+    public String demandeS;
+    public String lettreAffect;
+    public String nomSociete;
+    public String numSociete;
+    public String emailSociete;
     public String nomCoach;
     public String prenomCoach;
     public String numCoach;
     public String emailCoach;
+    public Date startAt;
+    public Date endAt;
+    public LocalDate ValidationCon;
+    public Type type;
     private boolean etat;
+
+    @JsonBackReference
     @DBRef
     private User user;
 
@@ -52,19 +64,14 @@ public class Stage {
 
     // Autres méthodes de la classe Stage
 
-    public String getReportDate() {
-        return reportDate;
-    }
-
-    public void setReportDate(String reportDate) {
-        this.reportDate = reportDate;
-    }
     public boolean isEtat() {
         return etat;
     }
+
     public void addEncadrant(User encadrant) {
         this.encadrant = encadrant;
     }
+
     private byte[] attestationPdf;
 
     public void setAttestationPdf(byte[] attestationPdf) {
@@ -74,13 +81,7 @@ public class Stage {
     public byte[] getAttestationPdf() {
         return attestationPdf;
     }
-    public LocalDate getDateValidationCon() {
-        return ValidationCon;
-    }
 
-    public void setDateValidationCon(LocalDate ValidationCon) {
-        this.ValidationCon = ValidationCon;
-    }
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -88,4 +89,7 @@ public class Stage {
         Stage stage = (Stage) obj;
         return Objects.equals(id, stage.id);
     }
+
+
+
 }

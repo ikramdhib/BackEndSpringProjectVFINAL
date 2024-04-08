@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.Services.IServiceStage;
 import tn.esprit.pidev.Services.UserServices.IServiceUser;
 import tn.esprit.pidev.entities.Stage;
@@ -35,6 +36,15 @@ public class StageRestController {
         @Autowired
         private IServiceStage iServiceStage;
         private IServiceUser iServiceUser;
+
+    private final IServiceStage stageService;
+
+    @Autowired
+    public StageRestController(IServiceStage stageService) {
+        this.stageService = stageService;
+    }
+    @Autowired
+    UserRepository userRepository ;
         @GetMapping("/userNames")
         public Map<String, String> getAllStagesWithUserNames() {
                 return iServiceStage.getAllStagesWithUserNames();
@@ -52,15 +62,73 @@ public class StageRestController {
         }
         @PostMapping("/sendEmailToStudent/{stageId}/{reason}")
         public String sendEmailToStudent(@PathVariable String stageId,@PathVariable String reason) {
-                try {
-                        iServiceStage.sendEmailToStudent(stageId,reason);
-                        return "E-mail envoyé à l'étudiant avec succès.";
-                } catch (Exception e) {
-                        e.printStackTrace();
-                        return "Une erreur s'est produite lors de l'envoi de l'e-mail à l'étudiant.";
-                }
+            try {
+                iServiceStage.sendEmailToStudent(stageId, reason);
+                return "E-mail envoyé à l'étudiant avec succès.";
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Une erreur s'est produite lors de l'envoi de l'e-mail à l'étudiant.";
+            }
+        }
 
-}
+
+    @PostMapping("/ajouterEtAffecterStageAUtilisateur/{id}")
+    public ResponseEntity<String> ajouterEtAffecterStageAUtilisateur(@PathVariable String id , @RequestBody Stage stage) {
+        System.out.println("testttt");
+        User user = userRepository.findById(id).get() ;
+        stage.setUser(user);
+        System.out.println("hello stage user "+stage.getUser().getFirstName());
+        if (stage.getUser() != null) {
+            String userId = stage.getUser().getId();
+            stageService.ajouterEtAffecterStageAUtilisateur(stage, userId);
+            return ResponseEntity.ok("Stage ajouté et affecté à l'utilisateur avec succès !");
+        } else {
+            // Gérer le cas où User est null, par exemple, en renvoyant une erreur appropriée.
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'utilisateur associé au stage est null.");
+        }
+    }
+
+    @PostMapping("/save-demande-stage/{userId}")
+    public ResponseEntity<String> saveDemandeStage(@PathVariable String userId, @RequestBody String demandeStageContent) {
+        stageService.saveDemandeStage(userId, demandeStageContent);
+        return ResponseEntity.ok("Demande de stage enregistrée avec succès.");
+    }
+
+
+    @PutMapping("/updateStage/{stageId}")
+    public ResponseEntity<Stage> updateStage(@PathVariable String stageId, @RequestBody Stage updatedStage) {
+        Stage updated = stageService.updateStage(stageId, updatedStage);
+
+        if (updated != null) {
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{stageId}")
+    public ResponseEntity<?> deleteStage(@PathVariable String stageId) {
+        try {
+            // Appeler le service pour supprimer le stage
+            stageService.deleteStageById(stageId);
+            return new ResponseEntity<>("Stage supprimé avec succès", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Erreur lors de la suppression du stage", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{stageId}")
+    public Stage getStageById(@PathVariable String stageId){
+       return stageService.getStageById(stageId);
+    }
+
+    @GetMapping("/isJournalAssociated/{stageId}")
+    public ResponseEntity<Boolean> isJournalAssociated(@PathVariable String stageId) {
+        boolean isAssociated = stageService.isJournalAssociated(stageId);
+        return ResponseEntity.ok(isAssociated);
+    }
+
+
         @GetMapping("/studentsByEncadrant/{encadrantId}")
         public List<User> getStudentsByEncadrantId(@PathVariable String encadrantId) {
                 return iServiceStage.getStudentsByEncadrantId(encadrantId);
@@ -233,6 +301,50 @@ public class StageRestController {
                         return ResponseEntity.notFound().build();
                 }
         }
+
+    @PostMapping("/{stageId}/rapportPdf")
+    public ResponseEntity<String> uploadRapportPdf(@PathVariable String stageId, @RequestParam("file") MultipartFile file) {
+        try {
+            // Récupérer le stage existant à partir de son ID
+            Stage stage = stageService.getStageById(stageId);
+            if (stage != null) {
+                // Convertir le fichier MultipartFile en un tableau de bytes
+                byte[] pdfBytes = file.getBytes();
+                // Mettre à jour l'attribut rapportPdf du stage avec le nouveau PDF
+                stage.setRapportPdf(pdfBytes);
+                // Enregistrer le stage mis à jour dans la base de données
+                stageService.updateStage2(stageId,stage);
+                return ResponseEntity.ok("Rapport PDF ajouté avec succès.");
+            } else {
+                return ResponseEntity.notFound().build(); // Gérer le cas où le stage n'est pas trouvé
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'ajout du rapport PDF.");
+        }
+    }
+
+
+
+
+    @GetMapping("/{stageId}/rapportExiste")
+    public boolean rapportExiste(@PathVariable String stageId) {
+        return stageService.rapportExistePourStage(stageId);
+    }
+
+    @GetMapping("/attestationstage/{stageId}")
+    public ResponseEntity<ByteArrayResource> getAttestation(@PathVariable String stageId) {
+        Stage stage = stageService.findById(stageId);
+        ByteArrayResource resource = new ByteArrayResource(stage.getAttestationPdf());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=attestation.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(stage.getAttestationPdf().length)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(resource);
+    }
 
 }
 

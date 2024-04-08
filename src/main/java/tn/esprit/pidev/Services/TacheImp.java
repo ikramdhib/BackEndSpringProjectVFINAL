@@ -37,8 +37,8 @@ public class TacheImp implements ITacheService{
     public List<Tache> getTasksForUserAndStage(String userId, String stageId) {
         User user = userRepository.findById(userId).orElse(null);
         List<Tache> taskList = new ArrayList<>();
-        if (user != null && user.getStage() != null) {
-            for (Stage stage : user.getStage()) {
+        if (user != null && user.getStages() != null) {
+            for (Stage stage : user.getStages()) {
                 if (stage.getId().equals(stageId) && stage.getJournal() != null && stage.getJournal().getTaches() != null) {
                     for (Tache tache : stage.getJournal().getTaches()) {
                         // Ajoutez des détails de tâche directement à la liste

@@ -11,5 +11,5 @@ public interface TacheRepository extends MongoRepository<Tache,String> {
     List<Tache> findTacheByJournal(String journalId);
     List<Tache> findByJournal_Id(String journalId);
     List<Stage> findByJournal_TachesContains(Tache tache);
-
+    List<Tache> findByJournal_Stage_Id(String stageId);
 }

@@ -1,5 +1,6 @@
 package tn.esprit.pidev.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -8,7 +9,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.Email;
@@ -18,9 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-
-import java.util.List;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -30,8 +27,8 @@ import java.util.List;
 @Builder
 @Document(collection = "users")
 public class User  implements UserDetails {
+    @Id
     public String id;
-    @Size(max = 20)
     public String lastName;
     @Size(max = 20)
     public String firstName;
@@ -58,11 +55,22 @@ public class User  implements UserDetails {
     public boolean activated = false;
     public RoleName role;
     public boolean validated;
+    @JsonBackReference
+    @DBRef
+    private List<Note> notes;
+
+    //@DBRef
+    // private Role role;
+    @DBRef
+    private List<Stage> stage;
+    private String stageId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
+
+
 
     @Override
     public String getUsername() {
@@ -89,11 +97,7 @@ public class User  implements UserDetails {
         return true;
     }
 
-        //@DBRef
-        // private Role role;
-        @DBRef
-        private List<Stage> stage;
-        private String stageId;
+
 
         public String getStageId () {
             return stageId;
@@ -103,12 +107,7 @@ public class User  implements UserDetails {
             this.stageId = stageId;
         }
 
-    public User(String id, String firstName, String lastName) {
-            this.id = id;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.company = company;
-        }
+
 
         public void setStages (List < Stage > stages) {
             this.stage = stages;
@@ -116,6 +115,8 @@ public class User  implements UserDetails {
         public List<Stage> getStages () {
             return stage;
         }
+
+
 
 }
 

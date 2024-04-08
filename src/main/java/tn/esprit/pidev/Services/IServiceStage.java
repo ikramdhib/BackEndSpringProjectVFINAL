@@ -31,6 +31,22 @@ public interface IServiceStage {
     public void uploadPDF(String stageId, MultipartFile pdfFile) throws IOException;
     public InputStream getRapportDeStagePdfAvecOCR(String userId) ;
 
+    void ajouterEtAffecterStageAUtilisateur(Stage stage, String userId);
+    public void saveDemandeStage(String userId, String demandeStageContent);
 
+
+    public Stage updateStage(String stageId, Stage updatedStage);
+
+    public void deleteStageById(String stageId);
+
+    public Stage getStageById(String stageId);
+
+    public boolean isJournalAssociated(String stageId);
+
+    public Stage updateStage2(String stageId, Stage updatedStage);
+
+    public boolean rapportExistePourStage(String stageId);
+
+    public Stage findById(String id);
 
     }

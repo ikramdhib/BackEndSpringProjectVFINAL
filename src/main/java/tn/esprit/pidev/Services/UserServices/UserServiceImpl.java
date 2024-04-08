@@ -343,4 +343,40 @@ public class UserServiceImpl implements IServiceUser {
                 .collect(Collectors.toList());
     }
 
+
+    public User getUserById2(String userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    @Override
+    public List<User> getStudentsBySupervisorNote(String encadrantId) {
+        User encadrant = userRepository.findById(encadrantId)
+                .orElseThrow(() -> new IllegalArgumentException("Encadrant with ID " + encadrantId + " not found"));
+
+        List<Stage> stages = stageRepository.findByEncadrant(encadrant);
+        List<User> students = stages.stream()
+                .map(stage -> {
+                    User student = stage.getUser();
+                    User studentDTO = new User();
+                    studentDTO.setId(student.getId());
+                    studentDTO.setFirstName(student.getFirstName());
+                    studentDTO.setRole(RoleName.ENCADRANT);
+                    studentDTO.setLastName(student.getLastName());
+                    studentDTO.setLogin(student.getLogin()); // Ajout du login de l'étudiant
+                    studentDTO.setPhoneNumber(student.getPhoneNumber()); // Ajout du numéro de téléphone de l'étudiant
+                    studentDTO.setStageId(stage.getId());
+
+                    return studentDTO;
+                })
+                .collect(Collectors.toList());
+        students.forEach(student -> {
+            // Récupérer les stages associés à l'étudiant
+            List<Stage> studentStages = stageRepository.findByUser(student);
+
+            // Assigner les stages à l'étudiant
+            student.setStages(studentStages); // Assurez-vous que l'entité User a un setter pour la liste de stages
+        });
+        return students;
+    }
+
 }

@@ -52,4 +52,9 @@ public interface IServiceUser {
 
     public List<User> getEtudiants() ;
     public List<String> getStudentsNamesByStageService() ;
+
+    public User getUserById2(String userId);
+
+
+    public List<User> getStudentsBySupervisorNote(String encadrantId);
 }

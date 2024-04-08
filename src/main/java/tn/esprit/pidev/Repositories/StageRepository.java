@@ -24,4 +24,7 @@ public interface StageRepository extends MongoRepository<Stage,String> {
     @Query(value = "{ 'user' : { $ne : null } }")
     List<Stage> findStagesWithUsers();
 
+
+
+
 }
