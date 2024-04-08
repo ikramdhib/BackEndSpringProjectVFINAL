@@ -65,6 +65,10 @@ public class User  implements UserDetails {
     private List<Stage> stage;
     private String stageId;
 
+
+
+    @DBRef
+    private Offre offre;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

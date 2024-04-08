@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import tn.esprit.pidev.entities.RoleName;
 import tn.esprit.pidev.entities.User;
 
+<<<<<<< HEAD
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +19,4 @@ public interface UserRepository extends MongoRepository<User,String> {
     List<User> findByStageIsNotNull();
 
     User findUserById(String id);
-
-
-
 }
