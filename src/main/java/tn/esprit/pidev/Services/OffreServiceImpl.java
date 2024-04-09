@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class OffreServiceImpl implements IServiceOffre {
 
 
-    @Autowired
     private OffreRepository offreRepository;
     private UserRepository userRepository;
     private final Path rootLocation = Paths.get("images/");
@@ -111,6 +110,35 @@ public class OffreServiceImpl implements IServiceOffre {
         } catch (IOException e) {
             throw new RuntimeException("Impossible de créer le dossier pour les images", e);
         }
+    }
+
+
+
+
+    public Offre likeOffre(String offreId, String userId) {
+        Optional<Offre> offreOpt = offreRepository.findById(offreId);
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (offreOpt.isPresent() && userOpt.isPresent()) {
+            Offre offre = offreOpt.get();
+            User user = userOpt.get();
+            offre.like(user);
+            return offreRepository.save(offre);
+        }
+        // Gérer le cas où l'offre ou l'utilisateur n'existe pas...
+        throw new RuntimeException("Offre ou Utilisateur non trouvé");
+    }
+
+    public Offre dislikeOffre(String offreId, String userId) {
+        Optional<Offre> offreOpt = offreRepository.findById(offreId);
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (offreOpt.isPresent() && userOpt.isPresent()) {
+            Offre offre = offreOpt.get();
+            User user = userOpt.get();
+            offre.dislike(user);
+            return offreRepository.save(offre);
+        }
+        // Gérer le cas où l'offre ou l'utilisateur n'existe pas...
+        throw new RuntimeException("Offre ou Utilisateur non trouvé");
     }
 
 }

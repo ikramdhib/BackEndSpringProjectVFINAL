@@ -65,10 +65,12 @@ public class User  implements UserDetails {
     private List<Stage> stage;
     private String stageId;
 
-
-
     @DBRef
     private Offre offre;
+
+    @DBRef
+    private List<Commentaire> commentaires;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

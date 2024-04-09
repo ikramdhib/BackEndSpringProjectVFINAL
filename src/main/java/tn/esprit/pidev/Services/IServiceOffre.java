@@ -30,5 +30,8 @@ public interface IServiceOffre {
     // Méthode pour télécharger les images et les convertir en URL
 
     public String saveImage(MultipartFile imageFile)throws IOException;
+
+
+
 }
 
