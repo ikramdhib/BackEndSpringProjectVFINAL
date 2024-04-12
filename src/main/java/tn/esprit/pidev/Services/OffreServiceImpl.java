@@ -30,6 +30,22 @@ public class OffreServiceImpl implements IServiceOffre {
     // Create
     @Override
     public List<Offre> getAllOffres() {
+        return  offreRepository.findAll();
+    }
+
+
+    @Override
+    public Offre addOffre(Offre o) {
+        return offreRepository.save(o);
+    }
+
+    @Override
+    public Offre updateOffre(Offre o) {
+        return offreRepository.save(o);
+    }
+
+    @Override
+    public List<Offre> getAllOffre() {
         return offreRepository.findAll();
     }
 
@@ -48,7 +64,6 @@ public class OffreServiceImpl implements IServiceOffre {
     public Offre createOffre(Offre offre, String userId) {
 
         User user = userRepository.findById(userId).orElse(null);
-        offre.setUser(user);
         return offreRepository.save(offre);
 
     }
@@ -140,6 +155,13 @@ public class OffreServiceImpl implements IServiceOffre {
         // Gérer le cas où l'offre ou l'utilisateur n'existe pas...
         throw new RuntimeException("Offre ou Utilisateur non trouvé");
     }
+
+
+    public Offre getOffreByIdv2(String id) {
+        return offreRepository.findById(id).orElse(null);
+    }
+
+
 
 }
 

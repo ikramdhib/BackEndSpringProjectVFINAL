@@ -3,23 +3,28 @@ package tn.esprit.pidev.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Date;
+import java.util.List;
 
+@Document(collection = "offres")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Document(collection = "offres")
+@Builder
 public class Offre {
 
 
@@ -60,6 +65,7 @@ public class Offre {
     @JsonIgnore
     @DBRef
     private List<Commentaire> commentaires;
+
 
     public String getLienLinkedIn() {
         return lienLinkedIn;
@@ -240,3 +246,4 @@ public class Offre {
     }
 
 }
+
