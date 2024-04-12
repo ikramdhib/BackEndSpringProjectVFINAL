@@ -9,17 +9,17 @@ import tn.esprit.pidev.Services.ReclamationService.WebSocketServices.WebSocketSe
 @RestController
 @AllArgsConstructor
 @Slf4j
-@RequestMapping("/api/websocket")
+//@RequestMapping("/api/websocket")
 public class WebSocketController {
     private final WebSocketService webSocketService;
     @PostMapping("/send-message")
-    public void sendMessage(@RequestBody final ResponseModel notificationDAO) {
-        webSocketService.notifyFrontend(notificationDAO.getResponse());
+    public void sendMessage() {
+        webSocketService.notifyFrontend("ikram");
     }
 
-    @PostMapping("/send-private-message/{id}")
+  /*  @PostMapping("/send-private-message/{id}")
     public void sendPrivateMessage(@PathVariable final String id, @RequestBody final
     ResponseModel notificationDAO) {
         webSocketService.notifyUser(id,notificationDAO.getResponse());
-    }
+    }*/
 }

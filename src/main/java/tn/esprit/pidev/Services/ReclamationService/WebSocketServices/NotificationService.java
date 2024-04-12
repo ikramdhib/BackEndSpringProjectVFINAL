@@ -17,7 +17,7 @@ public class NotificationService implements INotificationService{
         log.info("eeeeeeeeeeeeeeeeeeeoooooo");
         ResponseModel message = new ResponseModel();
         message.setResponse("global notif");
-        messagingTemplate.convertAndSend("/topic/global-notifications", message);
+        messagingTemplate.convertAndSend("/topic/messages", message.getResponse());
     }
 
     @Override
