@@ -2,22 +2,22 @@ package tn.esprit.pidev.RestControllers;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import tn.esprit.pidev.Repositories.TagRepository;
 import tn.esprit.pidev.Services.QuestionServiceImpl;
 import tn.esprit.pidev.Services.TextRazorService;
 import tn.esprit.pidev.entities.Question;
 import tn.esprit.pidev.entities.QuestionResponse;
-import tn.esprit.pidev.entities.Tag;
+
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -51,8 +51,10 @@ public class QuestionRestController {
         }
     }
     @GetMapping("/getQuestion")
-    public List<Question> getQuestion(){
-        return questionService.getQuestion();
+    public Page<Question> getQuestions(@RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return questionService.getQuestion(pageable);
     }
     @GetMapping("/getQuestionById/{id}")
     public Question getQuestionById(@PathVariable String id){
@@ -61,6 +63,12 @@ public class QuestionRestController {
     @DeleteMapping("/deleteQuestion/{id}")
     public void deleteQuestion(@PathVariable String id) {
         questionService.deleteQuestion(id);
+    }
+    @PostMapping("/update-clusters")
+    public ResponseEntity<?> updateClusters(@RequestBody Map<String, String> payload) {
+        String csvFilePath = payload.get("csvFilePath");
+        // Utilisez le chemin pour lire le fichier CSV et mettre à jour MongoDB
+        return ResponseEntity.ok().build();
     }
 
 }

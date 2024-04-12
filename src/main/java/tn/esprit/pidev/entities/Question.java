@@ -22,4 +22,5 @@ public class Question {
     public String content;
     public User user;
     private List<Tag> tags;
+    private int cluster;
 }

@@ -3,6 +3,7 @@ package tn.esprit.pidev.Services;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,6 +19,9 @@ import tn.esprit.pidev.entities.QuestionResponse;
 import tn.esprit.pidev.entities.Tag;
 import tn.esprit.pidev.entities.User;
 
+import org.springframework.data.domain.Pageable;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -39,7 +43,6 @@ public class QuestionServiceImpl implements IServiceQuestion {
     private final String apiKey = "AIzaSyB8Mc8MXummb2ZNnkjWEaRnYYoBb8zRrME";
     private final String apiUrl = "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=" + apiKey;
 
-    // Méthode pour appeler Perspective API et obtenir un score de toxicité
     @Override
     public QuestionResponse addQuestion(Question question) {
         String originalContent = question.getContent();
@@ -86,21 +89,16 @@ public class QuestionServiceImpl implements IServiceQuestion {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Créez le corps de la requête
         Map<String, Object> requestPayload = new HashMap<>();
         requestPayload.put("comment", Collections.singletonMap("text", content));
         requestPayload.put("requestedAttributes", Collections.singletonMap("TOXICITY", new HashMap<>()));
 
-        // Emballez le corps de la requête et les en-têtes dans une entité
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestPayload, headers);
 
-        // Créez une instance de RestTemplate pour faire l'appel API
         RestTemplate restTemplate = new RestTemplate();
 
-        // Faites l'appel API et obtenez la réponse
         ResponseEntity<Map> response = restTemplate.postForEntity(apiUrl, requestEntity, Map.class);
 
-        // Initialisez le score de toxicité avec une valeur par défaut
         double toxicityScore = 0.0;
 
         // Vérifiez si la réponse est réussie
@@ -152,8 +150,8 @@ public class QuestionServiceImpl implements IServiceQuestion {
 
 
     @Override
-    public List<Question> getQuestion() {
-        return questionRepository.findAll();
+    public Page<Question> getQuestion(Pageable pageable) {
+        return questionRepository.findAll(pageable);
     }
 
     @Override
@@ -165,6 +163,28 @@ public class QuestionServiceImpl implements IServiceQuestion {
     public void deleteQuestion(String id) {
         questionRepository.deleteById(id);
     }
+
+    @Override
+    public void updateQuestionCluters(String csvFilePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(","); // Assurez-vous que c'est le bon délimiteur
+                String questionId = values[0]; // Assurez-vous que c'est la bonne colonne
+                int clusterId = Integer.parseInt(values[values.length - 1]); // Assurez-vous que le cluster est dans la dernière colonne
+
+                Question question = questionRepository.findById(questionId).orElse(null);
+                if (question != null) {
+                    question.setCluster(clusterId);
+                    questionRepository.save(question);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Gérez l'exception correctement
+        }
+    }
+
     @PostConstruct // Pour créer le répertoire des images au démarrage si nécessaire
     public void init() {
         try {
