@@ -1,4 +1,4 @@
-package tn.esprit.pidev.Services;
+package tn.esprit.pidev.Services.ReclamationService;
 
 import tn.esprit.pidev.entities.Reclamation;
 

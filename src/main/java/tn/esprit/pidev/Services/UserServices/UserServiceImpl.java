@@ -3,6 +3,7 @@ package tn.esprit.pidev.Services.UserServices;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,9 @@ import tn.esprit.pidev.Configurations.JwtService;
 import tn.esprit.pidev.Repositories.StageRepository;
 import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.Services.EmailService;
+import tn.esprit.pidev.Services.UserServices.Pagination.PagedResponse;
+import tn.esprit.pidev.Services.UserServices.Pagination.SearchRequest;
+import tn.esprit.pidev.Services.UserServices.Pagination.Util.SearchRequestUtil;
 import tn.esprit.pidev.Services.UserServices.UserListnner.MailingForgetPassListner;
 import tn.esprit.pidev.entities.Stage;
 import tn.esprit.pidev.entities.User;
@@ -18,6 +22,7 @@ import jakarta.ws.rs.NotFoundException;
 
 import tn.esprit.pidev.entities.RoleName;
 
+import java.awt.print.Pageable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -27,6 +32,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -55,6 +64,43 @@ public class UserServiceImpl implements IServiceUser {
             user.setPassword(passwordEncoder.encode(newPass));
         }
         return userRepository.save(user);
+    }
+
+    @Override
+    public User deleteUser(String id) {
+        User user = userRepository.findById(id).orElse(null);
+        if(user!=null){
+            userRepository.deleteById(id);
+        }
+     return user;
+    }
+
+    @Override
+    public User addServiceStage(User user) {
+        user.setRole(RoleName.SERVICE_STAGE);
+        user.setActivated(true);
+        user.setPassword(passwordEncoder.encode(user.password));
+        log.info(user+"999999999999999999999");
+        User user1 = userRepository.save(user);
+        return user1;
+    }
+
+    @Override
+    public User updateServiceStage(String id, User user) {
+        User user1 = userRepository.findById(id).orElse(null);
+        log.info("true8888888888888888888888888888");
+        if(user1!=null){
+            if(user.pic!=null){
+                user1.setPic(user1.pic);
+            }
+            user1.setAddress(user.address);
+            user1.setCin(user.cin);
+            user1.setPhoneNumber(user.phoneNumber);
+            user1.setLastName(user.lastName);
+            user1.setFirstName(user.firstName);
+            user1.setLogin(user.login);
+        }
+        return userRepository.save(user1);
     }
 
 
@@ -172,9 +218,26 @@ public class UserServiceImpl implements IServiceUser {
     }
 
     @Override
-    public List<User> getAllUserWithRole(RoleName roleName) {
+    public Boolean deBlockUser(String id) {
+        User user = userRepository.findById(id).orElse(null);
 
-        return userRepository.findByRole(roleName);
+        if(!user.isActivated()){
+            user.setActivated(true);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public PagedResponse<User> getAllUserWithRole(RoleName roleName , final SearchRequest request) {
+        final Page<User> response = userRepository.findByRole(roleName,SearchRequestUtil.toPageRequest(request));
+        if (response.isEmpty()) {
+            return new PagedResponse<>(Collections.emptyList(), 0, response.getTotalElements());
+        }
+
+        final List<User> dtos = response.getContent();
+        return new PagedResponse<>(dtos, dtos.size(), response.getTotalElements());
     }
     @Override
     public boolean createPasswordResetToken(String token , UserDetails userDetails){
@@ -197,28 +260,49 @@ public class UserServiceImpl implements IServiceUser {
         if(user1.role.equals(RoleName.ENCADRANT)){
             if(user.pic!=null){
                 try {
+                    user1.setPic(user.pic);
                     cloudinaryService.delete(user.pic);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
+            if(user.company!=null){
+                user1.setCompany(user.company);
+            }
+            if(user.login!=null){
+                user1.setLogin(user.login);
+            }
             user1.setAddress(user.address);
             user1.setPhoneNumber(user.phoneNumber);
-            user1.setPic(user.pic);
             user1.setEmailPro(user.emailPro);
             user1.setCin(user.cin);
         }else{
             if(user.pic!=null){
                 try {
+                    user1.setPic(user.pic);
                     cloudinaryService.delete(user.pic);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
+            if(user.firstName!=null){
+                user1.setFirstName(user.firstName);
+            }
+            if(user.lastName!=null){
+                user1.setLastName(user.lastName);
+            }
+            if(user.level!=null){
+                user1.setLevel(user.level);
+            }
+            if(user.unvId!=null){
+                user1.setUnvId(user.unvId);
+            }
+            if(user.login!=null){
+                user1.setLogin(user.login);
+            }
             user1.setAddress(user.address);
             user1.setPhoneNumber(user.phoneNumber);
             user1.setCin(user.cin);
-            user1.setPic(user.pic);
         }
         log.info(user1.pic);
         return userRepository.save(user1);

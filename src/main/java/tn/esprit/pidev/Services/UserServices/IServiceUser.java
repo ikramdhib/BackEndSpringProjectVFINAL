@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.RestControllers.AuthController.Param.AuthenticateResponse;
 import tn.esprit.pidev.RestControllers.AuthController.Param.AuthenticationRequest;
 import tn.esprit.pidev.RestControllers.AuthController.Param.RegesterRequest;
+import tn.esprit.pidev.Services.UserServices.Pagination.PagedResponse;
+import tn.esprit.pidev.Services.UserServices.Pagination.SearchRequest;
 import tn.esprit.pidev.entities.RoleName;
 import tn.esprit.pidev.entities.User;
 
@@ -25,8 +27,9 @@ public interface IServiceUser {
     User addSupervisor(User user);
 
     Boolean blockUser(String id);
+    Boolean deBlockUser(String id);
 
-    List<User> getAllUserWithRole(RoleName roleName);
+    PagedResponse<User> getAllUserWithRole(RoleName roleName , SearchRequest request);
 
     boolean createPasswordResetToken(String token , UserDetails userDetails);
 
@@ -38,9 +41,7 @@ public interface IServiceUser {
 
     User getUserByIdv(String id);
 
-
     User updatePassword(String id , String newPass) ;
-
 
     public List<User> getStudentsBySupervisor(String encadrantId);
     public User findUserById(String userId) ;
@@ -57,4 +58,9 @@ public interface IServiceUser {
 
 
     public List<User> getStudentsBySupervisorNote(String encadrantId);
+    User deleteUser(String id);
+
+    User addServiceStage(User user);
+
+    User updateServiceStage(String id , User user);
 }

@@ -1,5 +1,7 @@
 package tn.esprit.pidev.Repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import tn.esprit.pidev.entities.RoleName;
 import tn.esprit.pidev.entities.User;
@@ -18,4 +20,6 @@ public interface UserRepository extends MongoRepository<User,String> {
     List<User> findByStageIsNotNull();
 
     User findUserById(String id);
+
+    Page<User> findByRole(RoleName roleName , Pageable pageable);
 }
