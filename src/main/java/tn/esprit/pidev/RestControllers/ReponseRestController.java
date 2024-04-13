@@ -12,8 +12,8 @@ import java.util.List;
 public class ReponseRestController {
     public ReponseServiceImpl commentaireService;
     @PostMapping("/addReponse")
-    public Reponse addReponse(@RequestBody Reponse reponse , String id) {
-        return commentaireService.addReponse(reponse , id);
+    public Reponse addReponse(@RequestBody Reponse reponse) {
+        return commentaireService.addReponse(reponse);
     }
     @PutMapping("/updateReponse/{reponseId}")
     public Reponse updateReponse(@PathVariable String reponseId,@RequestBody Reponse reponse){
@@ -32,8 +32,8 @@ public class ReponseRestController {
         commentaireService.deleteReponse(id);
     }
     @GetMapping("/findMostAnsweredQuestionByUser/{userId}")
-    public List<Question> findMostAnsweredQuestionByUser(@PathVariable String userId) {
-        return commentaireService.findMostAnsweredQuestionByUser(userId);
+    public List<Question> findMostAnsweredQuestionsByUser(@PathVariable String userId) {
+        return commentaireService.findMostAnsweredQuestionsByUser(userId);
     }
     @GetMapping("/nombreReponseByQuestion/{questionId}")
     public int nombreReponseByQuestion(@PathVariable String questionId) {

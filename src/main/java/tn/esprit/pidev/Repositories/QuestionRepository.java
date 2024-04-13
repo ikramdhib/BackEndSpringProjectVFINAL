@@ -1,7 +1,11 @@
 package tn.esprit.pidev.Repositories;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import tn.esprit.pidev.entities.Question;
 
+import org.springframework.data.domain.Pageable;
+
 public interface QuestionRepository extends MongoRepository<Question,String> {
+    Page<Question> findAll(Pageable pageable);
 }
