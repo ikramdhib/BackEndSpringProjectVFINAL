@@ -156,6 +156,7 @@ public class UserServiceImpl implements IServiceUser {
                       .level(user.level)
                       .unvId(user.unvId)
                       .phoneNumber(user.phoneNumber)
+                      .createdAt(user.createdAt)
                 .build());
     }
 
@@ -201,6 +202,7 @@ public class UserServiceImpl implements IServiceUser {
                         .company(user.company)
                         .pic(user.pic)
                         .cin(user.cin)
+                        .createdAt(user.createdAt)
                         .build()
         );
     }

@@ -13,10 +13,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Services.OffreServiceImpl;
+import tn.esprit.pidev.Services.UserServices.CloudinaryService;
 import tn.esprit.pidev.entities.Offre;
 import tn.esprit.pidev.entities.Type;
+import tn.esprit.pidev.entities.User;
 import tn.esprit.pidev.utils.LinkedInScraper;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -30,7 +34,7 @@ public class OffreRestController {
 
 
     private OffreServiceImpl offreService;
-
+    public CloudinaryService cloudinaryService ;
 
     @GetMapping
     public List<Offre> getAllOffres() {
@@ -185,8 +189,17 @@ public class OffreRestController {
             offre.setLienLinkedIn(lienLinkedIn);
 
             if (imageFile != null && !imageFile.isEmpty()) {
-                String imageUrl = offreService.saveImage(imageFile);
-                offre.setImageUrl(imageUrl);
+
+                BufferedImage bi = ImageIO.read(imageFile.getInputStream());
+
+                if (bi == null){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("image invalide");
+                }
+
+                Map result = cloudinaryService.upload(imageFile);
+
+              //  String imageUrl = offreService.saveImage(imageFile);
+                offre.setImageUrl((String) result.get("url"));
             }
 
             Offre savedOffre = offreService.createOffre(offre, userId);
@@ -195,6 +208,16 @@ public class OffreRestController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Une erreur s'est produite lors de l'enregistrement de l'offre ou de l'image.");
         }
+    }
+
+    @GetMapping("/getOffre/user/{id}")
+    public List<Offre> getOffresWIthUserId(String id) {
+        return offreService.getOffresWIthUserId(id);
+    }
+
+    @GetMapping("/byuser/{userId}")
+    public List<Offre> getAllOffresForUser(@PathVariable String userId) {
+        return offreService.getAllOffresForUser(userId);
     }
 
 }

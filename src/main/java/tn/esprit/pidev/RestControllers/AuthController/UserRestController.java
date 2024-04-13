@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -53,32 +54,35 @@ public class UserRestController {
                                             @RequestParam("cin") String cin ,
                                             @RequestParam("level") Level level,
                                             @RequestParam("unvId") String unvId) throws IOException {
-        User user = new User();
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setCin(cin);
-        user.setAddress(address);
-        user.setLevel(level);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setPhoneNumber(phoneNumber);
-        user.setUnvId(unvId);
+        if(userRepository.findByLogin(login).isPresent()){
+            responseModel.setResponse("USER EXIST");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
+        }else {
+            User user = new User();
+            user.setLogin(login);
+            user.setPassword(password);
+            user.setCin(cin);
+            user.setAddress(address);
+            user.setLevel(level);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setPhoneNumber(phoneNumber);
+            user.setUnvId(unvId);
+            user.setCreatedAt( new Date());
 
+            BufferedImage bi = ImageIO.read(file.getInputStream());
 
-        BufferedImage bi = ImageIO.read(file.getInputStream());
+            if (bi == null) {
+                return new ResponseEntity<>("Image non valide!", HttpStatus.BAD_REQUEST);
+            }
+            Map result = cloudinaryService.upload(file);
 
-        if(bi ==null){
-            return new ResponseEntity<>("Image non valide!", HttpStatus.BAD_REQUEST);
+            user.setPic((String) result.get("url"));
+
+            User user1 = userService.addStudentUser(user);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(user1);
         }
-        Map result = cloudinaryService.upload(file);
-
-        user.setPic((String) result.get("url"));
-
-        User user1 = userService.addStudentUser(user);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(user1);
-
-
     }
 
     @PostMapping("/addSupervisor")
@@ -92,38 +96,44 @@ public class UserRestController {
                                                @RequestParam("cin") String cin ,
                                                @RequestParam("emailPro") String emailPro,
                                                @RequestParam("company") String company) throws IOException {
-        try {
-            User user = new User();
-            user.setPhoneNumber(phoneNumber);
-            user.setLastName(lastName);
-            user.setFirstName(firstName);
-            user.setCin(cin);
-            user.setAddress(address);
-            user.setLogin(login);
-            user.setPassword(password);
-            user.setEmailPro(emailPro);
-            user.setCompany(company);
-
-
-            BufferedImage bi = ImageIO.read(file.getInputStream());
-
-            if(bi ==null){
-                responseModel.setResponse("Image non valide!");
-                return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
-            }
-
-            Map result = cloudinaryService.upload(file);
-
-             user.setPic((String) result.get("url"));
-
-
-            User user1 = userService.addSupervisor(user);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(user1);
-
-        }catch (IOException e){
-            responseModel.setResponse("BAD REQUEST");
+        if (userRepository.findByLogin(login).isPresent()) {
+            responseModel.setResponse("USER EXIST");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
+        }else {
+            try {
+                User user = new User();
+                user.setPhoneNumber(phoneNumber);
+                user.setLastName(lastName);
+                user.setFirstName(firstName);
+                user.setCin(cin);
+                user.setAddress(address);
+                user.setLogin(login);
+                user.setPassword(password);
+                user.setEmailPro(emailPro);
+                user.setCompany(company);
+                user.setCreatedAt(new Date());
+
+
+                BufferedImage bi = ImageIO.read(file.getInputStream());
+
+                if (bi == null) {
+                    responseModel.setResponse("Image non valide!");
+                    return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+                }
+
+                Map result = cloudinaryService.upload(file);
+
+                user.setPic((String) result.get("url"));
+
+
+                User user1 = userService.addSupervisor(user);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(user1);
+
+            } catch (IOException e) {
+                responseModel.setResponse("BAD REQUEST");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
+            }
         }
     }
 

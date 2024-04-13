@@ -2,6 +2,7 @@ package tn.esprit.pidev.Services;
 
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class OffreServiceImpl implements IServiceOffre {
 
 
@@ -50,6 +52,11 @@ public class OffreServiceImpl implements IServiceOffre {
     }
 
     @Override
+    public List<Offre> getOffresWIthUserId(String id) {
+        return offreRepository.findOffreByUserIdLike(id);
+    }
+
+    @Override
     public Map<String, List<Offre>> groupOffresByEntreprise() {
         return getAllOffres().stream()
                 .collect(Collectors.groupingBy(Offre::getNomEntreprise));
@@ -64,6 +71,9 @@ public class OffreServiceImpl implements IServiceOffre {
     public Offre createOffre(Offre offre, String userId) {
 
         User user = userRepository.findById(userId).orElse(null);
+
+        log.info(user+"-----------------------------------------------");
+        offre.setUser(user);
         return offreRepository.save(offre);
 
     }
@@ -161,7 +171,9 @@ public class OffreServiceImpl implements IServiceOffre {
         return offreRepository.findById(id).orElse(null);
     }
 
-
+    public List<Offre> getAllOffresForUser(String userId) {
+        return offreRepository.findByUser_Id(userId); // Assuming you have a method in your repository to find offers by user ID
+    }
 
 }
 

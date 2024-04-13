@@ -36,5 +36,8 @@ public interface IServiceOffre {
     public Offre addOffre(Offre o);
     public Offre updateOffre(Offre o);
     public List<Offre> getAllOffre();
+
+
+    public List<Offre> getOffresWIthUserId(String id);
 }
 
