@@ -5,29 +5,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import tn.esprit.pidev.Services.EmailService;
 import tn.esprit.pidev.Services.IServiceDemande;
 import tn.esprit.pidev.entities.Demande;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @RequestMapping("/api/demandes")
+@CrossOrigin(origins = "http://localhost:56616") // Décommentez cette ligne
 
 
 public class DemandeController {
+
     @Autowired
     private IServiceDemande demandeService;
 
+    private final JavaMailSender javaMailSender;
+
+
     @Value("/Demande/${file.upload-dir}")
     private String uploadDir;
+
+    public DemandeController(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
+
+
 
     // Endpoint to get all demands
     @GetMapping("/GetListDemande")
@@ -45,24 +55,47 @@ public class DemandeController {
     }
 
     // Endpoint to create a new demand
-    @PostMapping("/CreateDemande")
-    public ResponseEntity<Demande> createDemande(@RequestBody Demande demande) {
-        Demande createdDemande = demandeService.createDemande(demande);
-        return new ResponseEntity<>(createdDemande, HttpStatus.CREATED);
-    }
+    //@PostMapping("/CreateDemande")
+    //public ResponseEntity<Demande> createDemande(@RequestBody Demande demande) {
+    // Demande createdDemande = demandeService.createDemande(demande);
+    //  return new ResponseEntity<>(createdDemande, HttpStatus.CREATED);
+    //}
 
+
+    // Endpoint to update a demand
+    // Endpoint to update a demand
     // Endpoint to update a demand
     @PutMapping("/UpdateDemande/{id}")
     public ResponseEntity<Demande> updateDemande(@PathVariable String id, @RequestBody Demande updatedDemande) {
         Optional<Demande> existingDemande = demandeService.getDemandeById(id);
         if (existingDemande.isPresent()) {
-            updatedDemande.setId(id);
-            Demande savedDemande = demandeService.updateDemande(updatedDemande);
-            return new ResponseEntity<>(savedDemande, HttpStatus.OK);
+            Demande existingDemandeInstance = existingDemande.get();
+
+            // Check if two hours have passed since creation
+            long hoursElapsed = Duration.between(existingDemandeInstance.getCreatedAt(), LocalDateTime.now())
+                    .toHours();
+            if (hoursElapsed >= 2) {
+                // Update the fields you want to change
+                existingDemandeInstance.setTitre(updatedDemande.getTitre());
+                existingDemandeInstance.setStudentName(updatedDemande.getStudentName());
+                existingDemandeInstance.setStudentEmail(updatedDemande.getStudentEmail());
+
+                // Call the service to save the updated demand
+                Demande savedDemande = demandeService.updateDemande(existingDemandeInstance);
+
+                return new ResponseEntity<>(savedDemande, HttpStatus.OK);
+            } else {
+                // Return a response indicating that the update is not allowed
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+
+
+
 
     // Endpoint to delete a demand
     @DeleteMapping("/Delete/{id}")
@@ -73,37 +106,11 @@ public class DemandeController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @PutMapping("/{demandeId}/assigner-offre/{offreId}")
-    public ResponseEntity<Demande> assignerDemandeAOffre(@PathVariable String demandeId, @PathVariable String offreId) {
-        Demande demande = demandeService.assignerDemandeAOffre(demandeId, offreId);
-        return new ResponseEntity<>(demande, HttpStatus.OK);
-    }
-    @PostMapping("/CreateDemandeWithFile")
-    public ResponseEntity<Demande> createDemandeWithFile(@RequestBody Demande demande,
-                                                 @RequestParam("cv") MultipartFile cvFile) {
-        // Logique pour sauvegarder le fichier CV
-        String cvPath = saveCVFile(cvFile);
 
-        // Associer le chemin du fichier CV à la demande
-        demande.setCvPath(cvPath);
 
-        // Créer la demande
-        Demande createdDemande = demandeService.createDemande(demande);
 
-        return new ResponseEntity<>(createdDemande, HttpStatus.CREATED);
-    }
 
-    // Méthode pour sauvegarder le fichier CV
-    private String saveCVFile(MultipartFile cvFile) {
-        String fileName = StringUtils.cleanPath(cvFile.getOriginalFilename());
-        String filePath = Paths.get(uploadDir, fileName).toString();
 
-        try {
-            Files.copy(cvFile.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
-            return filePath;
-        } catch (IOException e) {
-            throw new RuntimeException("Impossible de sauvegarder le fichier CV. Veuillez réessayer!", e);
-        }
-    }
+
 
 }

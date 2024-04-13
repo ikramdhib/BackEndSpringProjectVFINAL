@@ -3,6 +3,7 @@ package tn.esprit.pidev.Services;
 import org.bson.types.ObjectId;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.entities.Offre;
+import tn.esprit.pidev.entities.Type;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,6 +38,7 @@ public interface IServiceOffre {
     public Offre updateOffre(Offre o);
     public List<Offre> getAllOffre();
 
+    public List<Offre> findByType(Type type);
 
     public List<Offre> getOffresWIthUserId(String id);
 }

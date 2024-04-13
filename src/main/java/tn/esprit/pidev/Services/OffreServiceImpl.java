@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Repositories.OffreRepository;
 import tn.esprit.pidev.Repositories.UserRepository;
 import tn.esprit.pidev.entities.Offre;
+import tn.esprit.pidev.entities.Type;
 import tn.esprit.pidev.entities.User;
 
 import java.io.IOException;
@@ -173,6 +174,11 @@ public class OffreServiceImpl implements IServiceOffre {
 
     public List<Offre> getAllOffresForUser(String userId) {
         return offreRepository.findByUser_Id(userId); // Assuming you have a method in your repository to find offers by user ID
+    }
+
+    @Override
+    public List<Offre> findByType(Type type) {
+        return offreRepository.findByType(type);
     }
 
 }

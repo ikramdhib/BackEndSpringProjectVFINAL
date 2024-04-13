@@ -8,9 +8,9 @@ import java.util.Optional;
 public interface IServiceDemande {
     List<Demande> getAllDemandes();
     Optional<Demande> getDemandeById(String id);
-    Demande createDemande(Demande demande);
+    Demande adddemande(Demande demande,String userId);
     Demande updateDemande(Demande demande);
     boolean deleteDemande(String id);
 
-    Demande assignerDemandeAOffre(String demandeId, String offreId);
+    // Demande assignerDemandeAOffre(String idDemande, String idOffre);
 }
