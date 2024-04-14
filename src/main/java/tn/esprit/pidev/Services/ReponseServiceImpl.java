@@ -59,11 +59,11 @@ public class ReponseServiceImpl implements IServiceReponse {
     }
 
     @Override
-    public Reponse addReponse(Reponse reponse) {
+    public Reponse addReponse(Reponse reponse , String id) {
         String originalContent = reponse.getContent();
         String filteredContent = filterContent(originalContent);
         reponse.setContent(filteredContent);
-        User user = userRepository.findById("65d5faf88ecbf72fd4d359f2").orElse(null);
+        User user = userRepository.findById(id).orElse(null);
         reponse.setUser(user);
         return reponseRepository.save(reponse);
     }

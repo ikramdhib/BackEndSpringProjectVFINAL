@@ -49,4 +49,7 @@ public interface IServiceStage {
 
     public Stage findById(String id);
 
+
+    public List<Stage> getAllStageWithUsrId(String id);
+
     }

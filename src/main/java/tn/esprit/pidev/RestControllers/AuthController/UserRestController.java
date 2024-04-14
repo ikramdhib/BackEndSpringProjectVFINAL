@@ -332,6 +332,7 @@ public class UserRestController {
 
         return nonValidatedStudents;
     }
+
     @GetMapping("/students/byStageService")
     public List<String> getStudentsNamesByStageService() {
         return userService.getStudentsNamesByStageService();

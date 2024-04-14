@@ -462,6 +462,11 @@ public class StageServiceImpl implements IServiceStage{
         return stageRepository.findById(id).orElse(null);
     }
 
+
+    @Override
+    public List<Stage> getAllStageWithUsrId(String id){
+        return stageRepository.findByUser_Id(id);
+    }
 }
 
 

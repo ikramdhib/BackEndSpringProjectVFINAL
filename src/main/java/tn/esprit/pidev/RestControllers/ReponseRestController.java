@@ -1,5 +1,6 @@
 package tn.esprit.pidev.RestControllers;
 
+import jakarta.ws.rs.Path;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.Services.ReponseServiceImpl;
@@ -11,9 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ReponseRestController {
     public ReponseServiceImpl commentaireService;
-    @PostMapping("/addReponse")
-    public Reponse addReponse(@RequestBody Reponse reponse) {
-        return commentaireService.addReponse(reponse);
+    @PostMapping("/addReponse/{id}")
+    public Reponse addReponse(@RequestBody Reponse reponse ,@PathVariable String id) {
+        return commentaireService.addReponse(reponse , id);
     }
     @PutMapping("/updateReponse/{reponseId}")
     public Reponse updateReponse(@PathVariable String reponseId,@RequestBody Reponse reponse){

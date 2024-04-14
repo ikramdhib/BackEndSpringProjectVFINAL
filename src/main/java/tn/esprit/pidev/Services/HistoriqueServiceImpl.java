@@ -15,8 +15,8 @@ public class HistoriqueServiceImpl implements IServiceHistorique {
    private HistoriqueRepository historiqueRepository;
    private UserRepository userRepository;
     @Override
-    public void saveHistorique(Historique historique) {
-        User user = userRepository.findById("65d5faf88ecbf72fd4d359f2").orElse(null);
+    public void saveHistorique(Historique historique , String id) {
+        User user = userRepository.findById(id).orElse(null);
         historique.setUser(user);
        historiqueRepository.save(historique);
     }

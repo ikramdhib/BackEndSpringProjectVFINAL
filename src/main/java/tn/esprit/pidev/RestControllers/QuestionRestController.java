@@ -17,6 +17,7 @@ import tn.esprit.pidev.entities.QuestionResponse;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -26,11 +27,11 @@ public class QuestionRestController {
     private QuestionServiceImpl questionService;
     private TextRazorService textRazorService;
 
-    @PostMapping("/addQuestion")
-    public ResponseEntity<QuestionResponse> addQuestion(@RequestBody Question question) {
+    @PostMapping("/addQuestion/{id}")
+    public ResponseEntity<QuestionResponse> addQuestion(@RequestBody Question question ,@PathVariable String id) {
 
         // Si le contenu est validé, procédez à l'ajout de la question et retournez la réponse
-        QuestionResponse response = questionService.addQuestion(question);
+        QuestionResponse response = questionService.addQuestion(question , id);
         // Retournez la réponse dans une ResponseEntity avec le statut HTTP OK
         return ResponseEntity.ok(response);
     }
@@ -68,6 +69,12 @@ public class QuestionRestController {
         String csvFilePath = payload.get("csvFilePath");
         // Utilisez le chemin pour lire le fichier CSV et mettre à jour MongoDB
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/getQuetionsForUser/{id}")
+    public ResponseEntity<?> getAllQuestionForUser(@PathVariable String id){
+        List<Question> questions = questionService.getAllQuestionForUser(id);
+        return  ResponseEntity.status(HttpStatus.OK).body(questions);
     }
 
 }

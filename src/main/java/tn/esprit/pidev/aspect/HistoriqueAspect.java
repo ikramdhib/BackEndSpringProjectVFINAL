@@ -26,7 +26,8 @@ public class HistoriqueAspect {
     public void monitorService() {} //elle est juste un marqueur utilisé par Spring AOP pour savoir où appliquer les conseils définis dans vos aspects.
 
     @AfterReturning("monitorService()")
-    public void logServiceAccess(JoinPoint joinPoint) {
+    public void logServiceAccess(JoinPoint joinPoint ) {
+        String id="" ;
         Historique historique = new Historique();
 
         historique.setDateAction(new Date());
@@ -43,6 +44,6 @@ public class HistoriqueAspect {
             Reponse reponse = (Reponse) args[0];
             historique.setDetailsAction(historique.getDetailsAction() + " avec reponse ID: " + reponse.getId());
         }
-        historiqueService.saveHistorique(historique);
+        historiqueService.saveHistorique(historique,id); // a reglée
     }
 }

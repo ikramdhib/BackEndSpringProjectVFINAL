@@ -346,6 +346,12 @@ public class StageRestController {
                 .body(resource);
     }
 
+    @GetMapping("/stage/getAllWithUserId/{id}")
+    public ResponseEntity<?> getAllStageWithUserID(@PathVariable String id){
+            List<Stage> stages = stageService.getAllStageWithUsrId(id);
+            return ResponseEntity.status(HttpStatus.OK).body(stages);
+    }
+
 }
 
 

@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Repositories.QuestionRepository;
 import tn.esprit.pidev.Repositories.TagRepository;
 import tn.esprit.pidev.Repositories.UserRepository;
+import tn.esprit.pidev.Services.UserServices.Pagination.SearchRequest;
+import tn.esprit.pidev.Services.UserServices.Pagination.Util.SearchRequestUtil;
 import tn.esprit.pidev.entities.Question;
 import tn.esprit.pidev.entities.QuestionResponse;
 import tn.esprit.pidev.entities.Tag;
@@ -44,7 +46,7 @@ public class QuestionServiceImpl implements IServiceQuestion {
     private final String apiUrl = "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=" + apiKey;
 
     @Override
-    public QuestionResponse addQuestion(Question question) {
+    public QuestionResponse addQuestion(Question question , String id) {
         String originalContent = question.getContent();
         double toxicityScore = getToxicityScore(originalContent); // Vous devez implémenter cette méthode
         boolean isContentValid = textRazorService.validateContentForProgramming(question.getContent());
@@ -57,7 +59,7 @@ public class QuestionServiceImpl implements IServiceQuestion {
             return new QuestionResponse(true, "Votre contenu contient des mots toxiques", null);
         }
 
-        User user = userRepository.findById("65d5faf88ecbf72fd4d359f2").orElse(null);
+        User user = userRepository.findById(id).orElse(null);
         question.setUser(user);
         processTags(question);
         Question savedQuestion = questionRepository.save(question);
@@ -185,6 +187,8 @@ public class QuestionServiceImpl implements IServiceQuestion {
         }
     }
 
+
+
     @PostConstruct // Pour créer le répertoire des images au démarrage si nécessaire
     public void init() {
         try {
@@ -193,4 +197,10 @@ public class QuestionServiceImpl implements IServiceQuestion {
             throw new RuntimeException("Impossible de créer le dossier pour les images", e);
         }
     }
+
+    @Override
+    public List<Question> getAllQuestionForUser(String id) {
+         return questionRepository.findByUserId(id);
+    }
+
 }
