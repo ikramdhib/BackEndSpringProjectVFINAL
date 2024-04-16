@@ -33,7 +33,7 @@ public class SecurityConfiguration {
                 .disable()
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**" ,"/websocket/**","/topic/messages/**","/message/**")
+                .requestMatchers("/api/v1/auth/**" ,"/ws/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

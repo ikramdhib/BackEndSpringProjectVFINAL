@@ -73,6 +73,12 @@ public class User  implements UserDetails {
     @DBRef
     private List<Commentaire> commentaires;
 
+    @DBRef
+    private List<Demande> demandes;
+
+    @DBRef
+    private List<Event>  events;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

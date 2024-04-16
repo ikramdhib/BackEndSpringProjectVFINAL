@@ -5,6 +5,7 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +37,7 @@ import java.util.Optional;
 public class StageServiceImpl implements IServiceStage{
     private UserRepository userRepository;
     private StageRepository stageRepository;
+    private PasswordEncoder passwordEncoder;
     private EmailService emailService;
     private static final Logger logger = (Logger) LoggerFactory.getLogger(StageServiceImpl.class);
 
@@ -119,7 +121,6 @@ public class StageServiceImpl implements IServiceStage{
         }
     }
 
-
     @Override
     public List<User> getStudentsByEncadrantId(String encadrantId) {
         return stageRepository.findByUser_Id(encadrantId)
@@ -130,26 +131,24 @@ public class StageServiceImpl implements IServiceStage{
     public void updateEncadrantInfoAndRemoveFromStage(String stageId) {
         Stage stage = stageRepository.findById(stageId).orElse(null);
         if (stage != null && stage.getUser() != null) {
-            // Récupérer les informations de l'encadrant depuis le stage
-            String firstName = stage.getNomCoach();
-            String lastName = stage.getPrenomCoach();
-            String phoneNumber = stage.getNumCoach();
-            String emailPro = stage.getEmailCoach();
+            // Récupérer l'utilisateur associé au stage
+            User user = stage.getUser();
 
-            // Créer un nouvel utilisateur avec le rôle "encadrant"
+            // Créer un nouvel encadrant à partir des informations de l'utilisateur
             User encadrant = new User();
-            encadrant.setFirstName(firstName);
-            encadrant.setLastName(lastName);
-            encadrant.setPhoneNumber(phoneNumber);
-            encadrant.setEmailPro(emailPro);
+            encadrant.setFirstName(user.getFirstName());
+            encadrant.setLastName(user.getLastName());
+            encadrant.setPhoneNumber(user.getPhoneNumber());
+            encadrant.setEmailPro(user.getEmailPro());
+            encadrant.setPassword(passwordEncoder.encode(generateRandomPassword()));
+            encadrant.setCreatedAt(new Date());
             encadrant.setRole(RoleName.ENCADRANT); // Définir le rôle d'encadrant
 
-            // Sauvegarder le nouvel utilisateur dans la table User
+            // Sauvegarder le nouvel encadrant dans la table User
             userRepository.save(encadrant);
 
-            // Ajouter l'encadrant au stage sans supprimer l'affectation de l'étudiant
-            stage.addEncadrant(encadrant); // Méthode à implémenter dans la classe Stage
-
+            // Associer l'encadrant au stage en tant qu'encadrant
+            stage.setEncadrant(encadrant);
 
             // Sauvegarder les modifications du stage avec l'encadrant ajouté
             stageRepository.save(stage);

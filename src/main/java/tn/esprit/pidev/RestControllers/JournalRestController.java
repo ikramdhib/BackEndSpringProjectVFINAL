@@ -17,7 +17,6 @@ import java.util.Map;
 @RestController
 @AllArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600 , allowCredentials = "true")
 public class JournalRestController {
 
     public IServiceJournal iServiceJournal;

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
@@ -51,4 +52,7 @@ public class Event {
     public void setEnd_date(String end_date) {
         this.end_date = end_date;
     }
+
+    @DBRef
+    private User user;
 }

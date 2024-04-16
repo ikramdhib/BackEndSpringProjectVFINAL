@@ -5,8 +5,8 @@ import tn.esprit.pidev.entities.Event;
 import java.util.List;
 
 public interface IServiceEvent {
-    Event addEvent(Event event);
-    List<Event> getAllEvents();
+    Event addEvent(Event event , String userId);
+    List<Event> getAllEvents(String userId);
 
 
 }

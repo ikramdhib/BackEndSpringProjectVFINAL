@@ -117,7 +117,7 @@ public class StageRestController {
         }
     }
 
-    @GetMapping("/{stageId}")
+    @GetMapping("/getstage/{stageId}")
     public Stage getStageById(@PathVariable String stageId){
        return stageService.getStageById(stageId);
     }
