@@ -20,11 +20,11 @@ import java.util.Optional;
 
 public interface IServiceUser {
 
-    User addStudentUser(User user);
+    User addStudentUser(User user) throws MessagingException, UnsupportedEncodingException;
 
     String saveImageForUsers(MultipartFile file) throws IOException;
 
-    User addSupervisor(User user);
+    User addSupervisor(User user) throws MessagingException, UnsupportedEncodingException;
 
     Boolean blockUser(String id);
     Boolean deBlockUser(String id);
@@ -60,7 +60,7 @@ public interface IServiceUser {
     public List<User> getStudentsBySupervisorNote(String encadrantId);
     User deleteUser(String id);
 
-    User addServiceStage(User user);
+    User addServiceStage(User user) throws MessagingException, UnsupportedEncodingException;
 
     User updateServiceStage(String id , User user);
 }

@@ -61,15 +61,21 @@ log.info(String.valueOf(userRepository.findByLogin(request.getLogin())));
         );
         var user = userRepository.findByLogin(request.getLogin())
                 .orElseThrow();
-        log.info(String.valueOf(user == null)+"----------------------------------------------------------");
-        log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + user.login);
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken=jwtService.generateRefreshToken(user);
-        return AuthenticateResponse.builder().
-                acesstoken(jwtToken).
-                refreshToken(refreshToken)
-                .build();
+        if(user.isActivated() ) {
+            log.info(String.valueOf(user == null) + "----------------------------------------------------------");
+            log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + user.login);
+            var jwtToken = jwtService.generateToken(user);
+            var refreshToken = jwtService.generateRefreshToken(user);
+            return AuthenticateResponse.builder().
+                    acesstoken(jwtToken).
+                    refreshToken(refreshToken)
+                    .build();
+        }
 
+        return AuthenticateResponse.builder()
+                .acesstoken(null)
+                .refreshToken(null)
+                .build();
     }
     public void refreshToken(HttpServletRequest request ,
                              HttpServletResponse response) throws IOException {

@@ -38,7 +38,7 @@ public class MailingForgetPassListner implements ApplicationListener<MailingEven
 
         MimeMessage message = javaMailSender.createMimeMessage();
         var messageHelper = new MimeMessageHelper(message);
-        messageHelper.setFrom("dhibikram50@gmail.com",senderName);
+        messageHelper.setFrom("tunitaste123@gmail.com",senderName);
         messageHelper.setTo(user.getLogin());
         messageHelper.setSubject(subject);
         messageHelper.setText(mailContent,true);
@@ -56,7 +56,26 @@ public class MailingForgetPassListner implements ApplicationListener<MailingEven
                 "<p> Thank you <br> Users Portal Service";
         MimeMessage message = javaMailSender.createMimeMessage();
         var messageHelper = new MimeMessageHelper(message);
-        messageHelper.setFrom("dhibikram50@gmail.com", senderName);
+        messageHelper.setFrom("tunitaste123@gmail.com", senderName);
+        messageHelper.setTo(user.getLogin());
+        messageHelper.setSubject(subject);
+        messageHelper.setText(mailContent, true);
+        javaMailSender.send(message);
+    }
+
+
+    public void sendWelcomeEmail(User user , StringBuilder code) throws MessagingException, UnsupportedEncodingException {
+        String subject = "Welcome to our organization";
+        String senderName = "User Registration Portal Service";
+        String mailContent = "<p> Hi, "+ user.getFirstName()+ ", </p>"+
+                "<p>Thank you for your confidence,"+"" +
+                "You can log in to your application with these following login and password. </p>"+
+                " this is your LOGIN : "+"<strong>"+user.getLogin()+"</strong>"+
+                " this is your PASSWORD : "+"<strong>"+code.toString()+"</strong>"+
+                "<p> Thank you <br> Users Portal Service";
+        MimeMessage message = javaMailSender.createMimeMessage();
+        var messageHelper = new MimeMessageHelper(message);
+        messageHelper.setFrom("tunitaste123@gmail.com", senderName);
         messageHelper.setTo(user.getLogin());
         messageHelper.setSubject(subject);
         messageHelper.setText(mailContent, true);

@@ -14,6 +14,7 @@ import tn.esprit.pidev.Services.UserServices.Pagination.PagedResponse;
 import tn.esprit.pidev.Services.UserServices.Pagination.SearchRequest;
 import tn.esprit.pidev.Services.UserServices.Pagination.Util.SearchRequestUtil;
 import tn.esprit.pidev.Services.UserServices.PasswordReset;
+import tn.esprit.pidev.Services.UserServices.UserListnner.MailingForgetPassListner;
 import tn.esprit.pidev.Services.UserServices.UserServiceImpl;
 import tn.esprit.pidev.entities.Level;
 import tn.esprit.pidev.entities.RoleName;
@@ -37,7 +38,7 @@ public class UserRestController {
 
     public UserServiceImpl userService;
     public UserRepository userRepository ;
-
+    public MailingForgetPassListner mailingForgetPassListner;
     private final  ResponseModel responseModel = new ResponseModel();
 
     public CloudinaryService cloudinaryService ;
@@ -45,21 +46,20 @@ public class UserRestController {
     @PostMapping("/addStudent")
     public ResponseEntity<?> addStudentUser(@RequestParam(value = "file" , required = false)MultipartFile file ,
                                             @RequestParam("login") String login ,
-                                            @RequestParam("password") String password ,
+                                            @RequestParam(value = "password",required = false) String password ,
                                             @RequestParam("lastName") String lastName,
                                             @RequestParam("firstName") String firstName,
                                             @RequestParam("phoneNumber") String phoneNumber ,
                                             @RequestParam("address") String address,
                                             @RequestParam("cin") String cin ,
                                             @RequestParam("level") Level level,
-                                            @RequestParam("unvId") String unvId) throws IOException {
+                                            @RequestParam("unvId") String unvId) throws IOException, MessagingException {
         if(userRepository.findByLogin(login).isPresent()){
             responseModel.setResponse("USER EXIST");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
         }else {
             User user = new User();
             user.setLogin(login);
-            user.setPassword(password);
             user.setCin(cin);
             user.setAddress(address);
             user.setLevel(level);
@@ -88,13 +88,13 @@ public class UserRestController {
     public ResponseEntity<?> addSupervisorUser(@RequestParam(value = "file" , required = false) MultipartFile file ,
                                                @RequestParam("login") String login ,
                                                @RequestParam("password") String password ,
-                                               @RequestParam("lastName") String lastName,
+                                               @RequestParam(value = "lastName" , required = false) String lastName,
                                                @RequestParam("firstName") String firstName,
                                                @RequestParam("phoneNumber") String phoneNumber ,
                                                @RequestParam("address") String address,
                                                @RequestParam("cin") String cin ,
                                                @RequestParam("emailPro") String emailPro,
-                                               @RequestParam("company") String company) throws IOException {
+                                               @RequestParam("company") String company) throws IOException, MessagingException {
         if (userRepository.findByLogin(login).isPresent()) {
             responseModel.setResponse("USER EXIST");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
@@ -107,7 +107,7 @@ public class UserRestController {
                 user.setCin(cin);
                 user.setAddress(address);
                 user.setLogin(login);
-                user.setPassword(password);
+
                 user.setEmailPro(emailPro);
                 user.setCompany(company);
                 user.setCreatedAt(new Date());
@@ -265,7 +265,7 @@ public class UserRestController {
     }
 
     @PostMapping("/addServiceStage")
-    public ResponseEntity<?> addServiceStage(@RequestBody User user){
+    public ResponseEntity<?> addServiceStage(@RequestBody User user) throws MessagingException, UnsupportedEncodingException {
         User user1 = userService.addServiceStage(user);
         if(user1!=null){
             return ResponseEntity.status(HttpStatus.OK).body(user1);

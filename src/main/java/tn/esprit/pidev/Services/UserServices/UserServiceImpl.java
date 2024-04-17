@@ -76,12 +76,24 @@ public class UserServiceImpl implements IServiceUser {
     }
 
     @Override
-    public User addServiceStage(User user) {
+    public User addServiceStage(User user) throws MessagingException, UnsupportedEncodingException {
+
+        StringBuilder codeBuilder = new StringBuilder();
+
+        Random random = new Random();
+
+        // Générer un code de 6 chiffres
+        for (int i = 0; i < 6; i++) {
+            int digit = random.nextInt(10); // Générer un chiffre aléatoire entre 0 et 9
+            codeBuilder.append(digit); // Ajouter le chiffre à la chaîne de caractères
+        }
+
         user.setRole(RoleName.SERVICE_STAGE);
         user.setActivated(true);
-        user.setPassword(passwordEncoder.encode(user.password));
+        user.setPassword(passwordEncoder.encode(codeBuilder));
         log.info(user+"999999999999999999999");
         User user1 = userRepository.save(user);
+        mailingForgetPassListner.sendWelcomeEmail(user,codeBuilder);
         return user1;
     }
 
@@ -141,12 +153,22 @@ public class UserServiceImpl implements IServiceUser {
         return userRepository.findByLoginLike(username);
     }
     @Override
-    public User addStudentUser(User user) {
+    public User addStudentUser(User user) throws MessagingException, UnsupportedEncodingException {
 
+        StringBuilder codeBuilder = new StringBuilder();
+
+        Random random = new Random();
+
+        // Générer un code de 6 chiffres
+        for (int i = 0; i < 6; i++) {
+            int digit = random.nextInt(10); // Générer un chiffre aléatoire entre 0 et 9
+            codeBuilder.append(digit); // Ajouter le chiffre à la chaîne de caractères
+        }
+        mailingForgetPassListner.sendWelcomeEmail(user,codeBuilder);
       return userRepository.save( User.builder()
                 .role(RoleName.ETUDIANT)
                 .login(user.login)
-                .password(passwordEncoder.encode(user.password))
+                .password(passwordEncoder.encode(codeBuilder))
                 .pic(user.pic)
                       .firstName(user.firstName)
                       .lastName(user.lastName)
@@ -187,14 +209,24 @@ public class UserServiceImpl implements IServiceUser {
     }
 
     @Override
-    public User addSupervisor(User user) {
+    public User addSupervisor(User user) throws MessagingException, UnsupportedEncodingException {
+        StringBuilder codeBuilder = new StringBuilder();
+
+        Random random = new Random();
+
+        // Générer un code de 6 chiffres
+        for (int i = 0; i < 6; i++) {
+            int digit = random.nextInt(10); // Générer un chiffre aléatoire entre 0 et 9
+            codeBuilder.append(digit); // Ajouter le chiffre à la chaîne de caractères
+        }
+        mailingForgetPassListner.sendWelcomeEmail(user,codeBuilder);
         return userRepository.save(
                 User.builder()
                         .lastName(user.lastName)
                         .firstName(user.firstName)
                         .address(user.address)
                         .login(user.login)
-                        .password(passwordEncoder.encode(user.password))
+                        .password(passwordEncoder.encode(codeBuilder))
                         .phoneNumber(user.phoneNumber)
                         .role(RoleName.ENCADRANT)
                         .activated(false)
