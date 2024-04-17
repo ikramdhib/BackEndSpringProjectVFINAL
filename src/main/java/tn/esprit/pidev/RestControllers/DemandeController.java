@@ -19,7 +19,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/demandes")
-@CrossOrigin(origins = "http://localhost:56616") // Décommentez cette ligne
 
 
 public class DemandeController {

@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600 , allowCredentials = "true")
 
 @RequestMapping("/api/notes")
 public class NoteRestController {

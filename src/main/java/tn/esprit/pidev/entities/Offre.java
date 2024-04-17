@@ -30,14 +30,11 @@ public class Offre {
 
     @Id
     private String id;
-
     private String nomEntreprise;
-
     private String nomEncadrant;
     private String prenomEncadrant;
     private String email;
     private String description;
-
     private Type type;
     @DateTimeFormat
     private Date datedebut_stage;

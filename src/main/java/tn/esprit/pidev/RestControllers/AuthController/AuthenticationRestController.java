@@ -29,7 +29,6 @@ import java.nio.file.Paths;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/v1/auth")
 @Slf4j
 public class AuthenticationRestController {

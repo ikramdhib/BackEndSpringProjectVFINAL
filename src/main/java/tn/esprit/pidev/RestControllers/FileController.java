@@ -27,7 +27,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("file")
 public class FileController {
     @Autowired

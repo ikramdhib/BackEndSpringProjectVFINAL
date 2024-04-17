@@ -20,7 +20,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class SecurityConfiguration {
 
     private final JWTAuthenticationFilter jwtAuthFilter;
@@ -54,6 +53,7 @@ public class SecurityConfiguration {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
+
         config.addAllowedOrigin("http://localhost:4200");
         config.addAllowedHeader("*");
         config.addAllowedMethod("OPTIONS");

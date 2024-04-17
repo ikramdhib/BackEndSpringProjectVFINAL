@@ -25,7 +25,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -137,17 +140,14 @@
             <artifactId>aspectjrt</artifactId>
             <version>1.9.7</version> <!-- Mettez à jour la version si nécessaire -->
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
+
 
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>5.2.3</version>
         </dependency>
-
+<!---3-->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
@@ -159,7 +159,7 @@
             <artifactId>tika-core</artifactId>
             <version>1.27</version>
         </dependency>
-
+<!--2-->
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
@@ -190,6 +190,8 @@
             <artifactId>json</artifactId>
             <version>20180813</version>
         </dependency>
+
+
 
     </dependencies>
     <build>

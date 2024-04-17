@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/v1/user")
 @Slf4j
 public class UserRestController {

@@ -4,16 +4,14 @@ import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.pidev.Repositories.QuestionRepository;
 import tn.esprit.pidev.Repositories.TagRepository;
 import tn.esprit.pidev.Repositories.UserRepository;
+import tn.esprit.pidev.Services.UserServices.CloudinaryService;
 import tn.esprit.pidev.Services.UserServices.Pagination.SearchRequest;
 import tn.esprit.pidev.Services.UserServices.Pagination.Util.SearchRequestUtil;
 import tn.esprit.pidev.entities.Question;
@@ -22,6 +20,9 @@ import tn.esprit.pidev.entities.Tag;
 import tn.esprit.pidev.entities.User;
 
 import org.springframework.data.domain.Pageable;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -43,6 +44,8 @@ public class QuestionServiceImpl implements IServiceQuestion {
     private TextRazorService textRazorService;
     private final Path rootLocation = Paths.get("images/");
     private final String apiKey = "AIzaSyB8Mc8MXummb2ZNnkjWEaRnYYoBb8zRrME";
+
+    private CloudinaryService cloudinaryService;
     private final String apiUrl = "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=" + apiKey;
 
     @Override
@@ -123,29 +126,37 @@ public class QuestionServiceImpl implements IServiceQuestion {
 
     public String saveImage(MultipartFile imageFile) throws IOException {
         //vérifier si le fichier reçu est vide
-        if (imageFile.isEmpty()) {
+     /*   if (imageFile.isEmpty()) {
             throw new IOException("Le fichier reçu est vide");
-        }
+        }*/
         //récupérer le nom de fichier original du fichier téléchargé
-        String originalFilename = imageFile.getOriginalFilename();
+    //    String originalFilename = imageFile.getOriginalFilename();
         //extraire l'extension du fichier a partie de son nom
-        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+     //   String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         //génère un nom de fichier unique pour l'image + extension
-        String savedFileName = UUID.randomUUID().toString() + extension;
+     //   String savedFileName = UUID.randomUUID().toString() + extension;
         //créer un objet path qui représente le chemin d'accèes au fichier de destination sur le serveur
-        Path destinationFile = this.rootLocation.resolve(Paths.get(savedFileName))
-                .normalize().toAbsolutePath();
+       /* Path destinationFile = this.rootLocation.resolve(Paths.get(savedFileName))
+                .normalize().toAbsolutePath();*/
         //vérifie que le chemin de destination est dans le répertoire rootLocation"
-        if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+    /*    if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
             throw new IOException("Impossible de stocker le fichier en dehors du répertoire courant");
-        }
+        }*/
         //ouvre un inputStream pour lire le contenu du fichier image et copie le contenu dans le fichier de destination
         //si le fichier existe déjà, il est remplacé
-        try (InputStream inputStream = imageFile.getInputStream()) {
+      /*  try (InputStream inputStream = imageFile.getInputStream()) {
             Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-        }
+        }*/
         // construire une url ou l'image est accesible
-        String imageUrl = "http://localhost:8081/images/" + savedFileName;
+
+        BufferedImage bi = ImageIO.read(imageFile.getInputStream());
+
+        if (bi == null) {
+            throw new IOException("Le fichier reçu est vide");
+        }
+        Map result = cloudinaryService.upload(imageFile);
+
+        String imageUrl = (String) result.get("url");
 
         return imageUrl;
     }

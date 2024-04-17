@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class TacheRestController {
     private ITacheService iTacheService;
     private IServiceUser iUserService;

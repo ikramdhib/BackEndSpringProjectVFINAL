@@ -53,8 +53,8 @@ public class User  implements UserDetails {
     @Size(max = 8)
     public String cin;
     public String address;
-    public boolean activated = false;
     public RoleName role;
+    public boolean activated = false;
     public boolean validated;
     public Date createdAt;
     @JsonBackReference

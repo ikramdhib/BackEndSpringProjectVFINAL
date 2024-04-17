@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.Services.PdfService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600 , allowCredentials = "true")
 public class DownloadController {
 
     private final PdfService pdfService;
