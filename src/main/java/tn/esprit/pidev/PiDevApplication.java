@@ -13,7 +13,6 @@ public class PiDevApplication {
     public static void main(String[] args) {
         SpringApplication.run(PiDevApplication.class, args);
 
-
     }
 
 }

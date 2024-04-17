@@ -19,6 +19,7 @@ import tn.esprit.pidev.entities.Notification;
     @MessageMapping("/application")
     @SendTo("/all/messages")
     public String send(final String message) throws Exception {
+        Thread.sleep(1000);
         return message;
     }
     @MessageMapping("/applications")

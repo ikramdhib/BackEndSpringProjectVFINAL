@@ -7,7 +7,7 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
-@Configuration
+
 public class ClientWebSocketConfig {
 
     @Bean

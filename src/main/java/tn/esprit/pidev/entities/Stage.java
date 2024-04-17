@@ -1,6 +1,7 @@
 package tn.esprit.pidev.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -58,6 +59,7 @@ public class Stage {
     public byte[] rapportPdf;
 
     private boolean rapportExiste;
+    @JsonIgnore
     @DBRef
     private User serviceStage;
 

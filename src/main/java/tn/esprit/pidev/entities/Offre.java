@@ -53,7 +53,7 @@ public class Offre {
     @DBRef
     private List<User> dislikedBy = new ArrayList<>();
 
-
+    @JsonIgnore
     @DBRef
     private User user;
 
