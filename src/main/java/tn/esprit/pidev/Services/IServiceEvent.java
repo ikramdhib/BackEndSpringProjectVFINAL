@@ -6,7 +6,8 @@ import java.util.List;
 
 public interface IServiceEvent {
     Event addEvent(Event event , String userId);
-    List<Event> getAllEvents(String userId);
+
+    List<Event> getAllEvents();
 
 
 }

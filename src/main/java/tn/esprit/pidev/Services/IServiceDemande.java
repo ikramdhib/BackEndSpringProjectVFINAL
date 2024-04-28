@@ -12,5 +12,7 @@ public interface IServiceDemande {
     Demande updateDemande(Demande demande);
     boolean deleteDemande(String id);
 
+    List<Demande> getDemandeWithOffreId(String id);
+
     // Demande assignerDemandeAOffre(String idDemande, String idOffre);
 }

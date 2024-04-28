@@ -19,8 +19,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/demandes")
-
-
 public class DemandeController {
 
     @Autowired
@@ -107,9 +105,10 @@ public class DemandeController {
     }
 
 
-
-
-
-
+    @GetMapping("/demandes/getDemandesOffre/{id}")
+    public ResponseEntity<?> getDemandesWithOffresId(@PathVariable  String id){
+        List<Demande> demandes = demandeService.getDemandeWithOffreId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(demandes);
+    }
 
 }

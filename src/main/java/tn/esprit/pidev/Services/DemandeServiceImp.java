@@ -57,4 +57,9 @@ public class DemandeServiceImp implements IServiceDemande {
         return false;
     }
 
+    @Override
+    public List<Demande> getDemandeWithOffreId(String id) {
+        return demandeRepository.findDemandeByOffre_id(id);
+    }
+
 }

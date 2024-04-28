@@ -62,6 +62,7 @@ log.info(String.valueOf(userRepository.findByLogin(request.getLogin())));
         var user = userRepository.findByLogin(request.getLogin())
                 .orElseThrow();
         if(user.isActivated() ) {
+            log.info("is Actived");
             log.info(String.valueOf(user == null) + "----------------------------------------------------------");
             log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + user.login);
             var jwtToken = jwtService.generateToken(user);

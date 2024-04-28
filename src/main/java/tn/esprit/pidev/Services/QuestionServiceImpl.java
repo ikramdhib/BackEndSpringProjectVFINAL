@@ -177,27 +177,6 @@ public class QuestionServiceImpl implements IServiceQuestion {
         questionRepository.deleteById(id);
     }
 
-    @Override
-    public void updateQuestionCluters(String csvFilePath) {
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(","); // Assurez-vous que c'est le bon délimiteur
-                String questionId = values[0]; // Assurez-vous que c'est la bonne colonne
-                int clusterId = Integer.parseInt(values[values.length - 1]); // Assurez-vous que le cluster est dans la dernière colonne
-
-                Question question = questionRepository.findById(questionId).orElse(null);
-                if (question != null) {
-                    question.setCluster(clusterId);
-                    questionRepository.save(question);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            // Gérez l'exception correctement
-        }
-    }
-
 
 
     @PostConstruct // Pour créer le répertoire des images au démarrage si nécessaire

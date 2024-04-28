@@ -18,18 +18,17 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
-    @GetMapping("/GetEvent/{userId}")
-    public List<Event> getAllOffresForUser(@PathVariable String userId) {
-        return eventService.getAllEvents(userId);
+    @GetMapping("/GetAllEvents")
+    public ResponseEntity<List<Event>> getAllEvents() {
+        List<Event> events = eventService.getAllEvents();
+        return new ResponseEntity<>(events, HttpStatus.OK);
     }
 
-    @PostMapping("/addEvent/{userId}") // Ajoutez le chemin d'accès pour l'ID de l'utilisateur
+
+    @PostMapping("/AddEvent/{userId}")
     public ResponseEntity<Event> addEvent(@RequestBody Event event, @PathVariable String userId) {
-        Event newEvent = eventService.addEvent(event, userId); // Appelez la méthode du service avec l'ID de l'utilisateur
-        return new ResponseEntity<>(newEvent, HttpStatus.CREATED);
+        Event createdEvent = eventService.addEvent(event, userId);
+        return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
     }
-
-
-
 
 }

@@ -1,5 +1,6 @@
 package tn.esprit.pidev.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,6 +36,12 @@ public class Demande {
 
     private String lettreMotivation;  // File path or content for lettre de motivation
 
+    @DBRef
+    private User user;
+
+    @JsonIgnore
+    @DBRef
+    private Offre offre;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -46,12 +53,6 @@ public class Demande {
     public void setUser(User user) {
         this.user = user;
     }
-    @DBRef
-    private User user;
-
-    @DBRef
-    private Offre offre;
-
 
 
 }

@@ -16,7 +16,7 @@ public class EventService implements IServiceEvent{
     @Autowired
     private EventRepo eventRepository;
     @Autowired
-    private UserServiceImpl userService;
+    private  UserServiceImpl userService;
 
 
     @Override
@@ -35,7 +35,8 @@ public class EventService implements IServiceEvent{
     }
 
     @Override
-    public List<Event> getAllEvents(String userId) {
-        return eventRepository.findByUser_Id(userId);
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
+
     }
 }

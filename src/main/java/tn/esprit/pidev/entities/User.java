@@ -1,6 +1,7 @@
 package tn.esprit.pidev.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -24,7 +25,6 @@ import java.util.List;
 @Data
 @Setter
 @Getter
-@ToString
 @Builder
 @Document(collection = "users")
 public class User  implements UserDetails {

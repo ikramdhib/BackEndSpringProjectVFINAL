@@ -8,5 +8,6 @@ import tn.esprit.pidev.entities.Event;
 import java.util.List;
 
 public interface EventRepo extends MongoRepository<Event,String> {
+    @Query("{ 'user._id': ?0 }")
     List<Event> findByUser_Id(String userId);
 }

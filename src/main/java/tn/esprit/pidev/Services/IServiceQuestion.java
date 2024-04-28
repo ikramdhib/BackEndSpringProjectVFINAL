@@ -14,7 +14,6 @@ public interface IServiceQuestion {
     public Page<Question> getQuestion(Pageable pageable);
     public Question getQuestionById(String id);
     public void deleteQuestion(String id);
-    public void updateQuestionCluters(String csvFilePath);
 
 
     public List<Question> getAllQuestionForUser(String id );

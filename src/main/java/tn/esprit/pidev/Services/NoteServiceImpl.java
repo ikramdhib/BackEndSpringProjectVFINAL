@@ -1,5 +1,6 @@
 package tn.esprit.pidev.Services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 @Service
+@Slf4j
 public class NoteServiceImpl implements IServiceNote{
 
     @Autowired
@@ -30,10 +32,12 @@ public class NoteServiceImpl implements IServiceNote{
 
     @Override
     public void assignNoteToStudent(String studentId, String encadrantId, Note note) {
+        log.info("log1");
         User student = userRepository.findById(studentId).orElse(null);
         User encadrant = userRepository.findById(encadrantId).orElse(null);
 
         if (student != null && encadrant != null) {
+            log.info("log2");
             note.setStudent(student); // Définir l'étudiant de la note
             note.setEncadrant(encadrant); // Définir l'encadrant de la note
             Note savedNote = noteRepository.save(note);

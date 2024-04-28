@@ -1,6 +1,7 @@
 package tn.esprit.pidev.RestControllers;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("file")
+@Slf4j
 public class FileController {
     @Autowired
     private FileService fileService;
@@ -42,7 +44,7 @@ public class FileController {
     private ExtractService extractService;
 
 
-    public static String UPLOAD_DIRECTORY = "C:\\Users\\LENOVO\\Documents\\GitHub\\ProjectPIAngular\\src\\assets\\cvs\\";
+    public static String UPLOAD_DIRECTORY = "D:\\AngularProjectMerge\\ProjectPIAngular\\src\\assets\\cvs\\";
 
     @Autowired
     private DemandeRepo demandeRepo;
@@ -78,7 +80,7 @@ public class FileController {
 
         return sb.toString();
     }
-    @PostMapping("/add")
+    @PostMapping("/addFile")
     public ResponseEntity<String> addPersonne(
             @RequestParam("titre") String titre,
             @RequestParam("description") String description,
@@ -87,10 +89,16 @@ public class FileController {
             @RequestParam("studentEmail") String studentEmail,
             @RequestParam("cvPath") MultipartFile cvPath,
             @RequestParam("lettreMotivation") MultipartFile lettreMotivation,
-            @RequestParam("idOffre") String idOffre
+            @RequestParam("idOffre") String idOffre,
+            @RequestParam("userId") String userId
     ) throws IOException {
+
+
+        log.info("log 1");
         Offre offre = offreService.getOffreByIdv2(idOffre);
-        if (offre != null) {
+        User user = userService.getUserById(userId).orElse(null);
+        if (offre != null && user!=null)  {
+            log.info("log 2");
             Demande demande = new Demande();
             demande.setTitre(titre);
             demande.setDescription(description);
@@ -98,6 +106,7 @@ public class FileController {
             demande.setStudentEmail(studentEmail);
             demande.setStudentName(studentName);
             demande.setOffre(offre);
+            demande.setUser(user);
 
             ResponseEntity<String> cvTextResponse = extractService.extractTextFromPDFFile(cvPath);
             if (cvTextResponse.getStatusCode() == HttpStatus.OK) {
