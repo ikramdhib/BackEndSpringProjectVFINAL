@@ -56,6 +56,16 @@ public class QuestionRestController {
         Pageable pageable = PageRequest.of(page, size);
         return questionService.getQuestion(pageable);
     }
+
+    @GetMapping("/getQuestionwithTags/{name}")
+    public Page<Question> getQuestionsWithTags( @PathVariable String name ,@RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size
+                                               ) {
+        Pageable pageable = PageRequest.of(page, size);
+        log.info("name====",name);
+        return  questionService.getAllQuestionWithTags(name,pageable);
+    }
+
     @GetMapping("/getQuestionById/{id}")
     public Question getQuestionById(@PathVariable String id){
         return questionService.getQuestionById(id);

@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface TagRepository extends MongoRepository<Tag,String> {
     Tag findByName(String name);
+
+    List<Tag> findAllByOrderByUsageCountDesc();
 }

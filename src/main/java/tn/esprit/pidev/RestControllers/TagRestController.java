@@ -23,4 +23,10 @@ public class TagRestController {
     public List<String> getAllTags() {
         return iServiceTag.getAllTagNames();
     }
+
+
+    @GetMapping("/getAllTagsordred")
+    public List<Tag> getAllTagsOrdred() {
+        return iServiceTag.getAllQuestionOrdred();
+    }
 }

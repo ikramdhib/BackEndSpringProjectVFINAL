@@ -1,5 +1,6 @@
 package tn.esprit.pidev.Services;
 
+import tn.esprit.pidev.entities.Question;
 import tn.esprit.pidev.entities.Tag;
 
 import java.util.List;
@@ -9,5 +10,8 @@ public interface IServiceTag {
     public List<Tag> getAllTags();
     public void deleteTag(String tagId);
     public List<String> getAllTagNames();
+
+
+    public List<Tag> getAllQuestionOrdred();
 
 }

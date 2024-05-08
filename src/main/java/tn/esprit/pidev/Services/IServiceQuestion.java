@@ -17,4 +17,8 @@ public interface IServiceQuestion {
 
 
     public List<Question> getAllQuestionForUser(String id );
+
+    public Page<Question> getAllQuestionWithTags(String name , Pageable pageable);
+
+
 }

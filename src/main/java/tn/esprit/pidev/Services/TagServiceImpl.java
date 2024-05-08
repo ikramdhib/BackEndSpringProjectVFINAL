@@ -3,6 +3,7 @@ package tn.esprit.pidev.Services;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tn.esprit.pidev.Repositories.TagRepository;
+import tn.esprit.pidev.entities.Question;
 import tn.esprit.pidev.entities.Tag;
 
 import java.util.List;
@@ -32,6 +33,11 @@ public class TagServiceImpl implements IServiceTag{
         return tagRepository.findAll().stream()
                 .map(Tag::getName)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Tag> getAllQuestionOrdred() {
+        return tagRepository.findAllByOrderByUsageCountDesc();
     }
 
 }

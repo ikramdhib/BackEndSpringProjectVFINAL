@@ -12,4 +12,6 @@ public interface QuestionRepository extends MongoRepository<Question,String> {
     Page<Question> findAll(Pageable pageable);
 
     List<Question> findByUserId(String id);
+
+    Page<Question> findByTagsNameLike(String name , Pageable pageable);
 }

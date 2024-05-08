@@ -46,9 +46,11 @@ public class QuestionServiceImpl implements IServiceQuestion {
     private final String apiKey = "AIzaSyB8Mc8MXummb2ZNnkjWEaRnYYoBb8zRrME";
 
     private CloudinaryService cloudinaryService;
+
+    private RestTemplate restTemplate;
     private final String apiUrl = "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=" + apiKey;
 
-    @Override
+   /* @Override
     public QuestionResponse addQuestion(Question question , String id) {
         String originalContent = question.getContent();
         double toxicityScore = getToxicityScore(originalContent); // Vous devez implémenter cette méthode
@@ -64,6 +66,58 @@ public class QuestionServiceImpl implements IServiceQuestion {
 
         User user = userRepository.findById(id).orElse(null);
         question.setUser(user);
+        processTags(question);
+        Question savedQuestion = questionRepository.save(question);
+        return new QuestionResponse(false, "Question ajoutée avec succès", savedQuestion);
+    }*/
+   @Override
+    public QuestionResponse addQuestion(Question question , String id) {
+        String originalContent = question.getContent();
+        double toxicityScore = getToxicityScore(originalContent); // Vous devez implémenter cette méthode
+        boolean isContentValid = textRazorService.validateContentForProgramming(question.getContent());
+
+        if (!isContentValid) {
+            // Retourner une réponse indiquant que le contenu n'est pas lié à la programmation
+            return new QuestionResponse(true, "Le contenu de la question n'est pas lié à la programmation informatique.", null);
+        }else if (toxicityScore > 0.1) {
+            // Ne pas enregistrer la question et renvoyer une réponse indiquant la présence de contenu toxique
+            return new QuestionResponse(true, "Votre contenu contient des mots toxiques", null);
+        }
+
+        //consommation R
+
+        String url = "http://localhost:8000/predictTags";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("content", originalContent);
+
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String[]> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String[].class);
+
+        List<String> tags = new ArrayList<>();
+        List<Tag> tagsList = new ArrayList<>();
+
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            log.info("it workss");
+            tags = Arrays.asList(responseEntity.getBody());
+            for(int i=0 ; i<tags.size();i++){
+                Tag t = new Tag();
+                log.info(tags.get(i));
+                t.setName(tags.get(i));
+                tagsList.add(t);
+            }
+        } else {
+            // Gérer les erreurs ici, par exemple en lançant une exception
+            throw new RuntimeException("Failed to predict tags. Status code: " + responseEntity.getStatusCode());
+        }
+
+        User user = userRepository.findById(id).orElse(null);
+        question.setUser(user);
+        question.setTags(tagsList);
         processTags(question);
         Question savedQuestion = questionRepository.save(question);
         return new QuestionResponse(false, "Question ajoutée avec succès", savedQuestion);
@@ -191,6 +245,11 @@ public class QuestionServiceImpl implements IServiceQuestion {
     @Override
     public List<Question> getAllQuestionForUser(String id) {
          return questionRepository.findByUserId(id);
+    }
+
+    @Override
+    public Page<Question> getAllQuestionWithTags(String name , Pageable pageable) {
+        return questionRepository.findByTagsNameLike(name ,pageable );
     }
 
 }
