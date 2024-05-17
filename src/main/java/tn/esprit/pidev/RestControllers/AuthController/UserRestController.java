@@ -136,6 +136,59 @@ public class UserRestController {
         }
     }
 
+
+    @PostMapping("/addAdministor")
+    public ResponseEntity<?> addAdministor(@RequestParam(value = "file" , required = false) MultipartFile file ,
+                                               @RequestParam("login") String login ,
+                                               @RequestParam("password") String password ,
+                                               @RequestParam(value = "lastName" , required = false) String lastName,
+                                               @RequestParam("firstName") String firstName,
+                                               @RequestParam("phoneNumber") String phoneNumber ,
+                                               @RequestParam("address") String address,
+                                               @RequestParam("cin") String cin ,
+                                               @RequestParam("emailPro") String emailPro,
+                                               @RequestParam("company") String company) throws IOException, MessagingException {
+        if (userRepository.findByLogin(login).isPresent()) {
+            responseModel.setResponse("USER EXIST");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
+        }else {
+            try {
+                User user = new User();
+                user.setPhoneNumber(phoneNumber);
+                user.setLastName(lastName);
+                user.setFirstName(firstName);
+                user.setCin(cin);
+                user.setAddress(address);
+                user.setLogin(login);
+                user.setPassword(password);
+                user.setEmailPro(emailPro);
+                user.setCompany(company);
+                user.setCreatedAt(new Date());
+
+
+                BufferedImage bi = ImageIO.read(file.getInputStream());
+
+                if (bi == null) {
+                    responseModel.setResponse("Image non valide!");
+                    return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+                }
+
+                Map result = cloudinaryService.upload(file);
+
+                user.setPic((String) result.get("url"));
+
+
+                User user1 = userService.addAdminstros(user);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(user1);
+
+            } catch (IOException e) {
+                responseModel.setResponse("BAD REQUEST");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
+            }
+        }
+    }
+
     @PutMapping("/blockUser/{id}")
     public ResponseEntity<?> blockUser(@PathVariable String id){
 

@@ -115,6 +115,16 @@ public class UserServiceImpl implements IServiceUser {
         return userRepository.save(user1);
     }
 
+    @Override
+    public User addAdminstros(User user) {
+        user.setRole(RoleName.CHEF_DEPARTEMENT);
+        user.setPassword(passwordEncoder.encode(user.password));
+        user.setActivated(true);
+        log.info(user+"999999999999999999999");
+        User user1 = userRepository.save(user);
+        return user1;
+    }
+
 
     public String confirmUpdatePass(String id, String newPass , String oldPass) throws MessagingException, UnsupportedEncodingException {
 

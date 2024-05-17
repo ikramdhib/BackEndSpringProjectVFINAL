@@ -63,4 +63,7 @@ public interface IServiceUser {
     User addServiceStage(User user) throws MessagingException, UnsupportedEncodingException;
 
     User updateServiceStage(String id , User user);
+
+
+    User addAdminstros(User user);
 }
