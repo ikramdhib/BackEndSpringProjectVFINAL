@@ -18,7 +18,7 @@ This project is a Spring Boot application designed to manage internships for a u
 - **Spring Security**: Handles authentication and authorization.
 - **JWT (JSON Web Token)**: Secures the API by issuing and validating tokens.
 - **Hibernate/JPA**: ORM framework for database interaction.
-- **MySQL/PostgreSQL**: Relational database to store application data.
+- **MongoDBL**: NOsql database to store application data.
 - **Maven**: Dependency management and build tool.
 - **Lombok**: Reduces boilerplate code.
 
@@ -28,7 +28,7 @@ This project is a Spring Boot application designed to manage internships for a u
 
 - **Java 17**: Ensure you have JDK 17 installed.
 - **Maven**: Ensure Maven is installed and configured.
-- **MySQL/PostgreSQL**: Set up a relational database.
+- **MongoDB**: Set up a Nosql database.
 - **Postman** (optional): For testing the API endpoints.
 
 ### Installation
